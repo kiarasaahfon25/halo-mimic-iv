@@ -5,10 +5,14 @@ import pandas as pd
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 
-mimic_dir = "/fs02/datasets/MIMIC-III/physionet.org/files/mimic3-carevue/1.4/"
-admissionFile = mimic_dir + "ADMISSIONS.csv.gz"
-diagnosisFile = mimic_dir + "DIAGNOSES_ICD.csv.gz"
-patientFile = mimic_dir + "PATIENTS.csv.gz"
+
+
+mimic_dir = "/fs02/datasets/MIMIC-IV/physionet.org/files/mimiciv/2.2/hosp"
+
+admissionFile = mimic_dir + "/admissions.csv.gz"
+diagnosisFile = mimic_dir + "/diagnoses_icd.csv.gz"
+patientFile = mimic_dir + "/patients.csv.gz"
+
 
 print("Loading CSVs Into Dataframes")
 #admissions
@@ -19,19 +23,30 @@ admissionDf = admissionDf.reset_index(drop=True)
 
 #diagnosis 
 diagnosisDf = pd.read_csv(diagnosisFile, dtype=str).set_index("hadm_id")
-diagnosisDf = diagnosisDf[diagnosisDf['icd9_code'].notnull()] #remove diagnoses without an ICD9_Code
-diagnosisDf = diagnosisDf[['icd9_code']]
+diagnosisDf = diagnosisDf[
+   diagnosisDf['icd_code'].notnull() & 
+   diagnosisDf['icd_version'].notnull()
+   ].copy() #remove diagnoses without an ICD_Code
+
+# Keep the original code without prefix
+diagnosisDf['raw_icd_code'] = diagnosisDf['icd_code']
+
+# Keep both ICD-9 and ICD-10 codes
+diagnosisDf['icd_code'] = (
+    'ICD' + diagnosisDf['icd_version'] + ':' + diagnosisDf['icd_code']
+)
+
+diagnosisDf = diagnosisDf[['raw_icd_code', 'icd_code', 'icd_version']]
 
 #patients
 patientDf = pd.read_csv(patientFile, dtype=str)
-patientDf['dob'] = pd.to_datetime(patientDf['dob']) #convert date of birth into python datetime
+#patientDf['dob'] = pd.to_datetime(patientDf['dob']) #convert date of birth into python datetime
 patientDf = patientDf.set_index('subject_id')
 
 #calculate patient age
-def calculate_age(dob, admittime):
-    age = admittime.year - dob.year
-
-    return age
+def calculate_age(anchor_age, anchor_year, admittime):
+    age = int(anchor_age) + (admittime.year - int(anchor_year))
+    return min(age,91)
 '''
 #limiting records for easier run on laptop
 admissionDf = admissionDf.head()
@@ -50,7 +65,7 @@ for row in tqdm(admissionDf.itertuples(), total=admissionDf.shape[0]):
             
     # Extracting the Diagnoses
     if hadm_id in diagnosisDf.index: 
-        diagnoses = list(set(diagnosisDf.loc[[hadm_id]]["icd9_code"])) #get all ICD9 diagnosis code for this hospital admission
+        diagnoses = list(set(diagnosisDf.loc[[hadm_id]]["icd_code"])) #get all ICD9 diagnosis code for this hospital admission
     else:
         diagnoses = []
     
@@ -76,6 +91,7 @@ for patient in data.values():
 
 all_codes = list(set(all_codes)) #remove duplicate codes and turn into a list
 
+np.random.seed(4)
 np.random.shuffle(all_codes)
 for c in all_codes:
     code_to_index[c] = len(code_to_index) #give each code a number
@@ -86,9 +102,14 @@ index_to_code = {v: k for k, v in code_to_index.items()}
 
 # Calculate age at the patient's last recorded admission
 for subject_id, patient in data.items():
-    dob = patientDf.loc[subject_id, 'dob']
-    last_admittime = patient['admittimes'][-1] #since admissions are sorted from oldest to newest
-    patient['last_age'] = calculate_age(dob, last_admittime)
+    anchor_age = patientDf.loc[subject_id, 'anchor_age']
+    anchor_year = patientDf.loc[subject_id, 'anchor_year']
+
+    last_admittime = patient['admittimes'][-1]
+
+    patient['last_age'] = calculate_age(
+        anchor_age, anchor_year, last_admittime
+    )
     patient['gender'] = patientDf.loc[subject_id, 'gender']
 
 
@@ -126,12 +147,18 @@ for p in data:
   label = np.zeros(len(group_to_id))
   for v in p['visits']:
     for c in v:
-      if c in code_to_group:
-        label[group_to_id[code_to_group[c]]] = 1
+      # Original CCS mapping is for ICD-9 codes
+      if not c.startswith("ICD9:"):
+        continue
+      
+      raw_code = c.split(":", 1)[1]
+      
+      if raw_code in code_to_group:
+        label[group_to_id[code_to_group[raw_code]]] = 1
   
   p['labels'] = label
 
-#covert visits to no longer use ICD9_Code but numberical codes
+#covert visits to no longer use ICD_Code but numberical codes
 print("Converting Visits")
 for p in data:
     new_visits = []
@@ -151,10 +178,98 @@ print(f"AVG VISIT LEN: {np.mean([len(v) for p in data for v in p['visits']])}")
 print(f"NUM RECORDS: {len(data)}")
 print(f"NUM LONGITUDINAL RECORDS: {len([p for p in data if len(p['visits']) > 1])}")
 
+
+# Initial data diagnostic
+print("\nInitial Diagnostic")
+
+num_patients = len(data)
+num_visits = [len(p["visits"]) for p in data]
+total_admissions = sum(num_visits)
+
+print(f"Number of patients: {num_patients}")
+print(f"Total admissions: {total_admissions}")
+
+if num_visits:
+    print(f"Median visits per patient: {np.median(num_visits):.2f}")
+    print(f"P90 visits per patient: {np.percentile(num_visits, 90):.2f}")
+    print(f"P95 visits per patient: {np.percentile(num_visits, 95):.2f}")
+    print(f"P99 visits per patient: {np.percentile(num_visits, 99):.2f}")
+    print(f"Maximum visits per patient: {max(num_visits)}")
+
+    print(f"Patients with multiple admissions: "
+          f"{sum(n > 1 for n in num_visits)}")
+
+    # HALO uses n_ctx=48, including special tokens.
+    # Two positions are reserved for special tokens, leaving 46 visits.
+    max_visits = 46
+    exceeding_context = sum(n > max_visits for n in num_visits)
+
+    print(f"Patients exceeding {max_visits} visits: {exceeding_context}")
+    print(f"Percentage exceeding visit context: "
+          f"{100 * exceeding_context / num_patients:.2f}%")
+
+# Codes per visit
+codes_per_visit = [
+    len(visit)
+    for p in data
+    for visit in p["visits"]
+]
+
+if codes_per_visit:
+    print(f"\nMean codes per visit: {np.mean(codes_per_visit):.2f}")
+    print(f"Median codes per visit: {np.median(codes_per_visit):.2f}")
+    print(f"P95 codes per visit: {np.percentile(codes_per_visit, 95):.2f}")
+    print(f"Maximum codes per visit: {max(codes_per_visit)}")
+
+# Diagnosis vocabulary
+print(f"\nVocabulary size: {len(code_to_index)}")
+
+# Total diagnosis entries and unique codes
+all_diagnoses = [
+    code for p in data
+    for visit in p["visits"]
+    for code in visit
+]
+
+print(f"Total diagnosis entries: {len(all_diagnoses)}")
+print(f"Unique diagnosis codes in data: {len(set(all_diagnoses))}")
+
+print(f"Patients with no diagnoses: "
+      f"{sum(not any(p['visits']) for p in data)}")
+
+
+# Sample counts for each subgroup
+print("\nSubgroup Counts")
+
+# Sex
+print("\nSex:")
+print(pd.Series([p['gender'] for p in data])
+      .value_counts(dropna=False))
+
+# Age groups
+print("\nAge groups:")
+age_bins = [18, 40, 65, 80, float('inf')]
+age_labels = ['18-39', '40-64', '65-79', '80+']
+
+ages = pd.Series([p['last_age'] for p in data])
+
+age_groups = pd.cut(
+    ages,
+    bins=age_bins,
+    labels=age_labels,
+    right=False
+)
+
+print(age_groups.value_counts(sort=False, dropna=False))
+
+
 # Train-Val-Test Split
 print("Splitting Datasets")
 train_dataset, test_dataset = train_test_split(data, test_size=0.2, random_state=4, shuffle=True) # 80 20 
 train_dataset, val_dataset = train_test_split(train_dataset, test_size=0.1, random_state=4, shuffle=True) #90 10 
+
+
+
 
 # Save Everything
 print("Saving Everything")
