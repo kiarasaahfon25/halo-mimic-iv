@@ -6,7 +6,8 @@ from tqdm import tqdm
 from sklearn.model_selection import train_test_split
 import os
 
-MAX_VISITS = 46 
+MAX_VISITS = 46
+TRANSFER_MAX_GAP = pd.Timedelta(hours=1) # next admission this soon after discharge is a transfer, not a readmission
 
 # Check that required files and folders exist before building the dataset
 required_files = [
@@ -99,16 +100,19 @@ for row in tqdm(admissionDf.itertuples(), total=admissionDf.shape[0]):
          'visits': [diagnoses],#create initial visit (new patient)
          'admittimes': [row.admittime],
          'dischtimes': [row.dischtime],
-         'hospital_expire_flags': [row.hospital_expire_flag]
+         'hospital_expire_flags': [row.hospital_expire_flag],
+         'admission_locations': [row.admission_location]
       }
     else:
       data[subject_id]['visits'].append(diagnoses) #add subsequent visits (same patient)
       data[subject_id]['admittimes'].append(row.admittime)
       data[subject_id]['dischtimes'].append(row.dischtime)
       data[subject_id]['hospital_expire_flags'].append(row.hospital_expire_flag)
+      data[subject_id]['admission_locations'].append(row.admission_location)
 
 # Calculate age at the patient's last recorded admission, mortality and readmission
 num_negative_gaps = 0 # overlapping admissions (next admittime before previous dischtime)
+num_transfers = 0 # gaps treated as transfers and excluded from readmission
 for subject_id, patient in data.items():
     anchor_age = patientDf.loc[subject_id, 'anchor_age']
     anchor_year = patientDf.loc[subject_id, 'anchor_year']
@@ -131,13 +135,24 @@ for subject_id, patient in data.items():
         for k in range(len(patient['admittimes']) - 1)
     ]
 
-    #double check if some hospital admissions for the same patient overlap!!
-    patient['readmission'] = int(any(gap < pd.Timedelta(days=30) for gap in gaps))
+    # Transfers (internal psych transfers, or back-to-back/overlapping stays) are not readmissions
+    is_transfer = [
+        patient['admission_locations'][k + 1] == 'INTERNAL TRANSFER TO OR FROM PSYCH'
+        or gaps[k] < TRANSFER_MAX_GAP
+        for k in range(len(gaps))
+    ]
+
+    patient['readmission'] = int(any(
+        gap < pd.Timedelta(days=30)
+        for gap, transfer in zip(gaps, is_transfer) if not transfer
+    ))
     num_negative_gaps += sum(gap < pd.Timedelta(0) for gap in gaps)
+    num_transfers += sum(is_transfer)
 
     del patient['admittimes']
     del patient['dischtimes']
     del patient['hospital_expire_flags']
+    del patient['admission_locations']
 
 
     if len(patient['visits']) > MAX_VISITS:
@@ -330,7 +345,8 @@ print(f"In-hospital mortality: {num_mortality} "
       f"({100 * num_mortality / len(data):.2f}% of patients)")
 print(f"30-day readmission: {num_readmission} "
       f"({100 * num_readmission / len(data):.2f}% of patients)")
-print(f"Overlapping admissions (negative gap, counted as readmission): "
+print(f"Transfers excluded from readmission: {num_transfers}")
+print(f"Overlapping admissions (negative gap, treated as transfer): "
       f"{num_negative_gaps}")
 
 
