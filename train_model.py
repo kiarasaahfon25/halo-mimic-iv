@@ -57,9 +57,9 @@ for e in tqdm(range(config.epoch)):
     loss.backward()
     optimizer.step()
     
-    if i % (50*config.batch_size) == 0: #500
+    if i % (500*config.batch_size) == 0: #500
       print("Epoch %d, Iter %d: Training Loss:%.6f"%(e, i, loss * 8))
-    if i % (50*config.batch_size) == 0:
+    if i % (500*config.batch_size) == 0:
       if i == 0:
         continue
     
