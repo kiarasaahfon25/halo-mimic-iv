@@ -4,10 +4,31 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
+import os
+
+MAX_VISITS = 46 
+
+# Check that required files and folders exist before building the dataset
+required_files = [
+    "hcup_ccs_2015_definitions_benchmark.yaml",
+    "ccs_benchmark_icd10_codes.csv",
+]
+
+for file in required_files:
+    if not os.path.isfile(file):
+        raise FileNotFoundError(f"Required file not found: {file}")
+
+# Check that the output directory exists
+if not os.path.isdir("./data"):
+    raise FileNotFoundError(
+        "Output directory './data' does not exist. Create it before running."
+    )
+
+print("All required files and output directories exist.")
 
 
-
-mimic_dir = "/fs02/datasets/MIMIC-IV/physionet.org/files/mimiciv/2.2/hosp"
+#retrieving mimic data
+mimic_dir = "/fs02/datasets/MIMIC-IV/physionet.org/files/mimiciv/3.1/hosp"
 
 admissionFile = mimic_dir + "/admissions.csv.gz"
 diagnosisFile = mimic_dir + "/diagnoses_icd.csv.gz"
@@ -18,11 +39,14 @@ print("Loading CSVs Into Dataframes")
 #admissions
 admissionDf = pd.read_csv(admissionFile, dtype=str)
 admissionDf['admittime'] = pd.to_datetime(admissionDf['admittime']) #covert column into python datetime
+admissionDf['dischtime'] = pd.to_datetime(admissionDf['dischtime']) 
 admissionDf = admissionDf.sort_values('admittime') #oldest to newest
 admissionDf = admissionDf.reset_index(drop=True) 
 
 #diagnosis 
 diagnosisDf = pd.read_csv(diagnosisFile, dtype=str).set_index("hadm_id")
+diagnosisDf = diagnosisDf.sort_index()
+
 diagnosisDf = diagnosisDf[
    diagnosisDf['icd_code'].notnull() & 
    diagnosisDf['icd_version'].notnull()
@@ -65,42 +89,26 @@ for row in tqdm(admissionDf.itertuples(), total=admissionDf.shape[0]):
             
     # Extracting the Diagnoses
     if hadm_id in diagnosisDf.index: 
-        diagnoses = list(set(diagnosisDf.loc[[hadm_id]]["icd_code"])) #get all ICD9 diagnosis code for this hospital admission
+        diagnoses = list(set(diagnosisDf.loc[[hadm_id]]["icd_code"])) #get all  diagnosis code for this hospital admission
     else:
         diagnoses = []
     
     # Building the hospital admission data point
     if subject_id not in data:
       data[subject_id] = {
-         'visits': [diagnoses],
-         'admittimes': [row.admittime]} #create initial visit (new patient)
+         'visits': [diagnoses],#create initial visit (new patient)
+         'admittimes': [row.admittime],
+         'dischtimes': [row.dischtime],
+         'hospital_expire_flags': [row.hospital_expire_flag]
+      }
     else:
       data[subject_id]['visits'].append(diagnoses) #add subsequent visits (same patient)
       data[subject_id]['admittimes'].append(row.admittime)
+      data[subject_id]['dischtimes'].append(row.dischtime)
+      data[subject_id]['hospital_expire_flags'].append(row.hospital_expire_flag)
 
-code_to_index = {} #dictionary
-
-#all_codes = list(set([c for p in data.values() for v in p['visits'] for c in v])) commenting out for readability
-
-all_codes = []
-
-for patient in data.values():
-    for visit in patient['visits']:
-        for code in visit:
-            all_codes.append(code)
-
-all_codes = list(set(all_codes)) #remove duplicate codes and turn into a list
-
-np.random.seed(4)
-np.random.shuffle(all_codes)
-for c in all_codes:
-    code_to_index[c] = len(code_to_index) #give each code a number
-print(f"VOCAB SIZE: {len(code_to_index)}")
-
-#reverse dictionary to show index, codex
-index_to_code = {v: k for k, v in code_to_index.items()}
-
-# Calculate age at the patient's last recorded admission
+# Calculate age at the patient's last recorded admission, mortality and readmission
+num_negative_gaps = 0 # overlapping admissions (next admittime before previous dischtime)
 for subject_id, patient in data.items():
     anchor_age = patientDf.loc[subject_id, 'anchor_age']
     anchor_year = patientDf.loc[subject_id, 'anchor_year']
@@ -112,11 +120,53 @@ for subject_id, patient in data.items():
     )
     patient['gender'] = patientDf.loc[subject_id, 'gender']
 
+    # In-hospital mortality: based on hospital_expire_flags
+    patient['mortality'] = int(
+    any(flag == '1' for flag in patient['hospital_expire_flags'])
+    )
+
+    # 30-day readmission: next admission less than 30 days after the previous discharge
+    gaps = [
+        patient['admittimes'][k + 1] - patient['dischtimes'][k]
+        for k in range(len(patient['admittimes']) - 1)
+    ]
+
+    #double check if some hospital admissions for the same patient overlap!!
+    patient['readmission'] = int(any(gap < pd.Timedelta(days=30) for gap in gaps))
+    num_negative_gaps += sum(gap < pd.Timedelta(0) for gap in gaps)
 
     del patient['admittimes']
+    del patient['dischtimes']
+    del patient['hospital_expire_flags']
 
 
+    if len(patient['visits']) > MAX_VISITS:
+       patient['visits'] = patient['visits'][-MAX_VISITS:]
+
+    
 data = list(data.values()) #removes subject ids 
+
+code_to_index = {} #save code as index
+
+#all_codes = list(set([c for p in data.values() for v in p['visits'] for c in v])) commenting out for readability
+
+all_codes = []
+
+for patient in data:
+    for visit in patient['visits']:
+        for code in visit:
+            all_codes.append(code)
+
+all_codes = sorted(set(all_codes)) #remove duplicate codes and turn into a list
+
+np.random.seed(4)
+np.random.shuffle(all_codes)
+for c in all_codes:
+    code_to_index[c] = len(code_to_index) #give each code a number
+print(f"VOCAB SIZE: {len(code_to_index)}")
+
+#reverse dictionary to show index, codex
+index_to_code = {v: k for k, v in code_to_index.items()}
 
 print("Adding Labels")
 with open("hcup_ccs_2015_definitions_benchmark.yaml") as definitions_file:
@@ -126,12 +176,21 @@ code_to_group = {} # Associates code to a group
 for group in definitions:
   if definitions[group]['use_in_benchmark'] == False:
       continue
-  codes = definitions[group]['codes']
+  codes = ['ICD9:' + code for code in definitions[group]['codes']]
   for code in codes:
       if code not in code_to_group:
         code_to_group[code] = group
       else:
-        assert code_to_group[code] == group #checks for  conflicts 
+        assert code_to_group[code] == group #checks for  conflicts
+
+# ICD-10 codes for the benchmark groups (generated by convert_benchmark_to_icd10.py)
+icd10_benchmark_df = pd.read_csv("ccs_benchmark_icd10_codes.csv", dtype=str)
+for group, icd10_code in zip(icd10_benchmark_df['group'], icd10_benchmark_df['icd10_code']):
+  code = 'ICD10:' + icd10_code
+  if code not in code_to_group:
+    code_to_group[code] = group
+  else:
+    assert code_to_group[code] == group #checks for  conflicts. If the code already exists verify that it belongs to the same group
 
 #creates sorted list of bench mark groups, position in the list is their id
 id_to_group = sorted([
@@ -147,14 +206,9 @@ for p in data:
   label = np.zeros(len(group_to_id))
   for v in p['visits']:
     for c in v:
-      # Original CCS mapping is for ICD-9 codes
-      if not c.startswith("ICD9:"):
-        continue
-      
-      raw_code = c.split(":", 1)[1]
-      
-      if raw_code in code_to_group:
-        label[group_to_id[code_to_group[raw_code]]] = 1
+      # Codes are prefixed with their ICD version, e.g. "ICD9:4019" or "ICD10:I10"
+      if c in code_to_group:
+        label[group_to_id[code_to_group[c]]] = 1
   
   p['labels'] = label
 
@@ -169,7 +223,13 @@ for p in data:
                 
         new_visits.append((list(set(new_visit)))) #removes duplicates (codes that appear more than once in the same hospital visit)
         
-    p['visits'] = new_visits    
+    p['visits'] = new_visits 
+
+# Verify that no patient exceeds the visit limit
+assert max(len(p['visits']) for p in data) <= MAX_VISITS, \
+    "Some patient histories still exceed 46 visits!"
+
+print("All patient histories fit within the 46-visit limit.")  
 
 print(f"MAX LEN: {max([len(p['visits']) for p in data])}")
 print(f"AVG LEN: {np.mean([len(p['visits']) for p in data])}")
@@ -201,7 +261,7 @@ if num_visits:
 
     # HALO uses n_ctx=48, including special tokens.
     # Two positions are reserved for special tokens, leaving 46 visits.
-    max_visits = 46
+    max_visits = MAX_VISITS
     exceeding_context = sum(n > max_visits for n in num_visits)
 
     print(f"Patients exceeding {max_visits} visits: {exceeding_context}")
@@ -261,6 +321,17 @@ age_groups = pd.cut(
 )
 
 print(age_groups.value_counts(sort=False, dropna=False))
+
+# Outcomes
+print("\nOutcomes:")
+num_mortality = sum(p['mortality'] for p in data)
+num_readmission = sum(p['readmission'] for p in data)
+print(f"In-hospital mortality: {num_mortality} "
+      f"({100 * num_mortality / len(data):.2f}% of patients)")
+print(f"30-day readmission: {num_readmission} "
+      f"({100 * num_readmission / len(data):.2f}% of patients)")
+print(f"Overlapping admissions (negative gap, counted as readmission): "
+      f"{num_negative_gaps}")
 
 
 # Train-Val-Test Split

@@ -1,0 +1,728 @@
+group,icd9_code,icd10_code,source
+Septicemia (except in labor),0031,A021,main
+Septicemia (except in labor),0202,A207,main
+Septicemia (except in labor),0223,A227,main
+Septicemia (except in labor),0362,A394,main
+Septicemia (except in labor),0380,A409,main
+Septicemia (except in labor),03810,A412,main
+Septicemia (except in labor),03811,A4101,main
+Septicemia (except in labor),03812,A4102,main
+Septicemia (except in labor),03819,A411,main
+Septicemia (except in labor),0382,A403,main
+Septicemia (except in labor),0383,A414,main
+Septicemia (except in labor),03840,A4150,main
+Septicemia (except in labor),03841,A413,main
+Septicemia (except in labor),03842,A4151,main
+Septicemia (except in labor),03843,A4152,main
+Septicemia (except in labor),03844,A4153,main
+Septicemia (except in labor),03849,A4159,main
+Septicemia (except in labor),0388,A4189,main
+Septicemia (except in labor),0389,A419,main
+Septicemia (except in labor),0545,B007,main
+Septicemia (except in labor),449,I76,main
+Septicemia (except in labor),77181,P369,main
+Septicemia (except in labor),7907,R7881,main
+Septicemia (except in labor),99591,A419,main
+Septicemia (except in labor),99592,R6520,main
+Diabetes mellitus without complication,24900,E139,main
+Diabetes mellitus without complication,25000,E119,main
+Diabetes mellitus without complication,25001,E109,main
+Diabetes mellitus without complication,7902,R739,supplementary
+Diabetes mellitus without complication,79021,R7301,main
+Diabetes mellitus without complication,79022,R7302,main
+Diabetes mellitus without complication,79029,R7303,main
+Diabetes mellitus without complication,7915,R81,main
+Diabetes mellitus without complication,7916,R824,main
+Diabetes mellitus without complication,V4585,Z9641,main
+Diabetes mellitus without complication,V5391,Z4681,main
+Diabetes mellitus without complication,V6546,Z4681,main
+Diabetes mellitus with complications,24901,E0965,main
+Diabetes mellitus with complications,24910,E1310,main
+Diabetes mellitus with complications,24911,E0910,main
+Diabetes mellitus with complications,24920,E1300,main
+Diabetes mellitus with complications,24921,E0901,main
+Diabetes mellitus with complications,24930,E13641,main
+Diabetes mellitus with complications,24931,E0965,main
+Diabetes mellitus with complications,24940,E0921,main
+Diabetes mellitus with complications,24941,E0921,main
+Diabetes mellitus with complications,24950,E0937X9,main
+Diabetes mellitus with complications,24951,E0939,main
+Diabetes mellitus with complications,24960,E1349,main
+Diabetes mellitus with complications,24961,E0940,main
+Diabetes mellitus with complications,24970,E1359,main
+Diabetes mellitus with complications,24971,E0951,main
+Diabetes mellitus with complications,24980,E1369,main
+Diabetes mellitus with complications,24981,E0969,main
+Diabetes mellitus with complications,24990,E138,main
+Diabetes mellitus with complications,24991,E098,main
+Diabetes mellitus with complications,25002,E1165,main
+Diabetes mellitus with complications,25003,E1065,main
+Diabetes mellitus with complications,25010,E1110,main
+Diabetes mellitus with complications,25011,E1010,main
+Diabetes mellitus with complications,25012,E1110,main
+Diabetes mellitus with complications,25013,E1065,main
+Diabetes mellitus with complications,25020,E1101,main
+Diabetes mellitus with complications,25021,E1069,main
+Diabetes mellitus with complications,25022,E1165,main
+Diabetes mellitus with complications,25023,E1069,main
+Diabetes mellitus with complications,25030,E1111,main
+Diabetes mellitus with complications,25031,E10641,main
+Diabetes mellitus with complications,25032,E1165,main
+Diabetes mellitus with complications,25033,E1065,main
+Diabetes mellitus with complications,25040,E1129,main
+Diabetes mellitus with complications,25041,E1029,main
+Diabetes mellitus with complications,25042,E1165,main
+Diabetes mellitus with complications,25043,E1065,main
+Diabetes mellitus with complications,25050,E1139,main
+Diabetes mellitus with complications,25051,E1037X9,main
+Diabetes mellitus with complications,25052,E1165,main
+Diabetes mellitus with complications,25053,E1065,main
+Diabetes mellitus with complications,25060,E1140,main
+Diabetes mellitus with complications,25061,E1040,main
+Diabetes mellitus with complications,25062,E1165,main
+Diabetes mellitus with complications,25063,E1065,main
+Diabetes mellitus with complications,25070,E1151,main
+Diabetes mellitus with complications,25071,E1051,main
+Diabetes mellitus with complications,25072,E1165,main
+Diabetes mellitus with complications,25073,E1065,main
+Diabetes mellitus with complications,25080,E1169,main
+Diabetes mellitus with complications,25081,E1069,main
+Diabetes mellitus with complications,25082,E1169,main
+Diabetes mellitus with complications,25083,E1069,main
+Diabetes mellitus with complications,25090,E118,main
+Diabetes mellitus with complications,25091,E108,main
+Diabetes mellitus with complications,25092,E118,main
+Diabetes mellitus with complications,25093,E108,main
+Disorders of lipid metabolism,2720,E7801,main
+Disorders of lipid metabolism,2721,E781,main
+Disorders of lipid metabolism,2722,E782,main
+Disorders of lipid metabolism,2723,E783,main
+Disorders of lipid metabolism,2724,E785,main
+Fluid and electrolyte disorders,2760,E870,main
+Fluid and electrolyte disorders,2761,E871,main
+Fluid and electrolyte disorders,2762,E872,main
+Fluid and electrolyte disorders,2763,E873,main
+Fluid and electrolyte disorders,2764,E874,main
+Fluid and electrolyte disorders,2765,E860,supplementary
+Fluid and electrolyte disorders,27650,E869,main
+Fluid and electrolyte disorders,27651,E860,main
+Fluid and electrolyte disorders,27652,E861,main
+Fluid and electrolyte disorders,2766,E872,supplementary
+Fluid and electrolyte disorders,27669,E8779,main
+Fluid and electrolyte disorders,2767,E875,main
+Fluid and electrolyte disorders,2768,E876,main
+Fluid and electrolyte disorders,2769,E878,main
+Fluid and electrolyte disorders,9951,T783XXA,main
+Essential hypertension,4011,I10,main
+Essential hypertension,4019,I169,main
+Essential hypertension,4010,I10,main
+Hypertension with complications and secondary hypertension,40200,I119,main
+Hypertension with complications and secondary hypertension,40201,I110,main
+Hypertension with complications and secondary hypertension,40210,I119,main
+Hypertension with complications and secondary hypertension,40211,I110,main
+Hypertension with complications and secondary hypertension,40290,I119,main
+Hypertension with complications and secondary hypertension,40291,I110,main
+Hypertension with complications and secondary hypertension,40300,I129,main
+Hypertension with complications and secondary hypertension,40301,I120,main
+Hypertension with complications and secondary hypertension,40310,I129,main
+Hypertension with complications and secondary hypertension,40311,I120,main
+Hypertension with complications and secondary hypertension,40390,I129,main
+Hypertension with complications and secondary hypertension,40391,I120,main
+Hypertension with complications and secondary hypertension,40400,I1310,main
+Hypertension with complications and secondary hypertension,40401,I130,main
+Hypertension with complications and secondary hypertension,40402,I1311,main
+Hypertension with complications and secondary hypertension,40403,I132,main
+Hypertension with complications and secondary hypertension,40410,I1310,main
+Hypertension with complications and secondary hypertension,40411,I130,main
+Hypertension with complications and secondary hypertension,40412,I1311,main
+Hypertension with complications and secondary hypertension,40413,I132,main
+Hypertension with complications and secondary hypertension,40490,I1310,main
+Hypertension with complications and secondary hypertension,40491,I130,main
+Hypertension with complications and secondary hypertension,40492,I1311,main
+Hypertension with complications and secondary hypertension,40493,I132,main
+Hypertension with complications and secondary hypertension,40501,I150,main
+Hypertension with complications and secondary hypertension,40509,I158,main
+Hypertension with complications and secondary hypertension,40511,I150,main
+Hypertension with complications and secondary hypertension,40519,I158,main
+Hypertension with complications and secondary hypertension,40591,I150,main
+Hypertension with complications and secondary hypertension,40599,I158,main
+Hypertension with complications and secondary hypertension,4372,I674,main
+Acute myocardial infarction,41000,I2109,main
+Acute myocardial infarction,41001,I2109,main
+Acute myocardial infarction,41002,I2109,main
+Acute myocardial infarction,41010,I2109,main
+Acute myocardial infarction,41011,I2109,main
+Acute myocardial infarction,41012,I2109,main
+Acute myocardial infarction,41020,I2119,main
+Acute myocardial infarction,41021,I2119,main
+Acute myocardial infarction,41022,I2119,main
+Acute myocardial infarction,41030,I2111,main
+Acute myocardial infarction,41031,I2111,main
+Acute myocardial infarction,41032,I2111,main
+Acute myocardial infarction,41040,I2119,main
+Acute myocardial infarction,41041,I2119,main
+Acute myocardial infarction,41042,I2119,main
+Acute myocardial infarction,41050,I2129,main
+Acute myocardial infarction,41051,I2129,main
+Acute myocardial infarction,41052,I2129,main
+Acute myocardial infarction,41060,I2129,main
+Acute myocardial infarction,41061,I2129,main
+Acute myocardial infarction,41062,I2129,main
+Acute myocardial infarction,41070,I214,main
+Acute myocardial infarction,41071,I214,main
+Acute myocardial infarction,41072,I214,main
+Acute myocardial infarction,41080,I2129,main
+Acute myocardial infarction,41081,I2129,main
+Acute myocardial infarction,41082,I2129,main
+Acute myocardial infarction,41090,I21A9,main
+Acute myocardial infarction,41091,I21A9,main
+Acute myocardial infarction,41092,I21A9,main
+Coronary atherosclerosis and other heart disease,4110,I241,main
+Coronary atherosclerosis and other heart disease,4111,I200,main
+Coronary atherosclerosis and other heart disease,41181,I240,main
+Coronary atherosclerosis and other heart disease,41189,I248,main
+Coronary atherosclerosis and other heart disease,412,I252,main
+Coronary atherosclerosis and other heart disease,4130,I208,main
+Coronary atherosclerosis and other heart disease,4131,I201,main
+Coronary atherosclerosis and other heart disease,4139,I209,main
+Coronary atherosclerosis and other heart disease,41400,I2510,main
+Coronary atherosclerosis and other heart disease,41401,I2510,main
+Coronary atherosclerosis and other heart disease,41406,I25811,main
+Coronary atherosclerosis and other heart disease,4142,I2582,main
+Coronary atherosclerosis and other heart disease,4143,I2583,main
+Coronary atherosclerosis and other heart disease,4144,I2584,main
+Coronary atherosclerosis and other heart disease,4148,I259,main
+Coronary atherosclerosis and other heart disease,4149,I259,main
+Coronary atherosclerosis and other heart disease,V4581,Z951,main
+Coronary atherosclerosis and other heart disease,V4582,Z9861,main
+Conduction disorders,4260,I442,main
+Conduction disorders,42610,I4430,main
+Conduction disorders,42611,I440,main
+Conduction disorders,42612,I441,main
+Conduction disorders,42613,I441,main
+Conduction disorders,4262,I4469,main
+Conduction disorders,4263,I447,main
+Conduction disorders,4264,I4510,main
+Conduction disorders,42650,I454,main
+Conduction disorders,42651,I452,main
+Conduction disorders,42652,I452,main
+Conduction disorders,42653,I452,main
+Conduction disorders,42654,I453,main
+Conduction disorders,4266,I455,main
+Conduction disorders,4267,I456,main
+Conduction disorders,42681,I456,main
+Conduction disorders,42682,I4581,main
+Conduction disorders,42689,I4589,main
+Conduction disorders,4269,I459,main
+Conduction disorders,V4500,Z959,main
+Conduction disorders,V4501,Z950,main
+Conduction disorders,V4502,Z95810,main
+Conduction disorders,V4509,Z95818,main
+Conduction disorders,V5331,Z45018,main
+Conduction disorders,V5332,Z4502,main
+Conduction disorders,V5339,Z4509,main
+Cardiac dysrhythmias,4270,I471,main
+Cardiac dysrhythmias,4271,I472,main
+Cardiac dysrhythmias,4272,I479,main
+Cardiac dysrhythmias,42731,I4891,main
+Cardiac dysrhythmias,42732,I4892,main
+Cardiac dysrhythmias,42760,I4940,main
+Cardiac dysrhythmias,42761,I491,main
+Cardiac dysrhythmias,42769,I4949,main
+Cardiac dysrhythmias,42781,R001,main
+Cardiac dysrhythmias,42789,R001,main
+Cardiac dysrhythmias,4279,I499,main
+Cardiac dysrhythmias,7850,R000,main
+Cardiac dysrhythmias,7851,R002,main
+Congestive heart failure; nonhypertensive,39891,I0981,main
+Congestive heart failure; nonhypertensive,4280,I50814,main
+Congestive heart failure; nonhypertensive,4281,I501,main
+Congestive heart failure; nonhypertensive,42820,I5020,main
+Congestive heart failure; nonhypertensive,42821,I5021,main
+Congestive heart failure; nonhypertensive,42822,I5022,main
+Congestive heart failure; nonhypertensive,42823,I5023,main
+Congestive heart failure; nonhypertensive,42830,I5030,main
+Congestive heart failure; nonhypertensive,42831,I5031,main
+Congestive heart failure; nonhypertensive,42832,I5032,main
+Congestive heart failure; nonhypertensive,42833,I5033,main
+Congestive heart failure; nonhypertensive,42840,I5040,main
+Congestive heart failure; nonhypertensive,42841,I5041,main
+Congestive heart failure; nonhypertensive,42842,I5042,main
+Congestive heart failure; nonhypertensive,42843,I5043,main
+Congestive heart failure; nonhypertensive,4289,I5089,main
+Acute cerebrovascular disease,34660,G43609,main
+Acute cerebrovascular disease,34661,G43619,main
+Acute cerebrovascular disease,34662,G43601,main
+Acute cerebrovascular disease,34663,G43611,main
+Acute cerebrovascular disease,430,I609,main
+Acute cerebrovascular disease,431,I619,main
+Acute cerebrovascular disease,4320,I621,main
+Acute cerebrovascular disease,4321,I6200,main
+Acute cerebrovascular disease,4329,I629,main
+Acute cerebrovascular disease,43301,I6322,main
+Acute cerebrovascular disease,43311,I63239,main
+Acute cerebrovascular disease,43321,I63219,main
+Acute cerebrovascular disease,43331,I6359,main
+Acute cerebrovascular disease,43381,I6359,main
+Acute cerebrovascular disease,43391,I6320,main
+Acute cerebrovascular disease,43400,I6629,main
+Acute cerebrovascular disease,43401,I6330,main
+Acute cerebrovascular disease,43410,I669,main
+Acute cerebrovascular disease,43411,I6340,main
+Acute cerebrovascular disease,43490,I669,main
+Acute cerebrovascular disease,43491,I6350,main
+Acute cerebrovascular disease,436,I6789,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),00322,A0222,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0203,A202,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0204,A202,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0205,A202,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0212,A212,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0221,A221,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0310,A310,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0391,A420,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0521,B012,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0551,B052,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0730,J17,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),0830,A78,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),1124,B371,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),1140,B380,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),1144,B381,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),1145,B382,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),11505,B392,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),11515,J17,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),11595,J17,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),1304,B583,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),1363,B59,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4800,J120,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4801,J121,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4802,J122,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4803,J1281,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4808,J1289,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4809,J129,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),481,J181,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4820,J150,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4821,J151,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4822,J14,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48230,J154,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48231,J154,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48232,J153,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48239,J154,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48240,J1520,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48241,J15211,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48242,J15212,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48249,J1529,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48281,J158,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48282,J155,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48283,J156,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48284,A481,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),48289,J158,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4829,J159,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4830,J157,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4831,J160,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4838,J168,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4841,B250,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4843,A3791,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4845,A221,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4846,B440,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4847,J17,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),4848,J17,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),485,J180,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),486,J189,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),5130,J852,main
+Pneumonia (except that caused by tuberculosis or sexually transmitted disease),5171,J17,main
+Chronic obstructive pulmonary disease and bronchiectasis,490,J40,main
+Chronic obstructive pulmonary disease and bronchiectasis,4910,J410,main
+Chronic obstructive pulmonary disease and bronchiectasis,4911,J411,main
+Chronic obstructive pulmonary disease and bronchiectasis,49120,J449,main
+Chronic obstructive pulmonary disease and bronchiectasis,49121,J441,main
+Chronic obstructive pulmonary disease and bronchiectasis,49122,J440,main
+Chronic obstructive pulmonary disease and bronchiectasis,4918,J418,main
+Chronic obstructive pulmonary disease and bronchiectasis,4919,J42,main
+Chronic obstructive pulmonary disease and bronchiectasis,4920,J439,main
+Chronic obstructive pulmonary disease and bronchiectasis,4928,J439,main
+Chronic obstructive pulmonary disease and bronchiectasis,4940,J479,main
+Chronic obstructive pulmonary disease and bronchiectasis,4941,J471,main
+Chronic obstructive pulmonary disease and bronchiectasis,496,J449,main
+Pleurisy; pneumothorax; pulmonary collapse,5100,J860,main
+Pleurisy; pneumothorax; pulmonary collapse,5109,J869,main
+Pleurisy; pneumothorax; pulmonary collapse,5110,R091,main
+Pleurisy; pneumothorax; pulmonary collapse,5111,J942,main
+Pleurisy; pneumothorax; pulmonary collapse,5118,J948,supplementary
+Pleurisy; pneumothorax; pulmonary collapse,51189,J948,main
+Pleurisy; pneumothorax; pulmonary collapse,5119,J918,main
+Pleurisy; pneumothorax; pulmonary collapse,5120,J930,main
+Pleurisy; pneumothorax; pulmonary collapse,5128,J942,supplementary
+Pleurisy; pneumothorax; pulmonary collapse,51281,J9311,main
+Pleurisy; pneumothorax; pulmonary collapse,51282,J9312,main
+Pleurisy; pneumothorax; pulmonary collapse,51283,J9381,main
+Pleurisy; pneumothorax; pulmonary collapse,51284,J9382,main
+Pleurisy; pneumothorax; pulmonary collapse,51289,J939,main
+Pleurisy; pneumothorax; pulmonary collapse,5180,J9819,main
+Pleurisy; pneumothorax; pulmonary collapse,5181,J982,main
+Pleurisy; pneumothorax; pulmonary collapse,5182,J983,main
+Respiratory failure; insufficiency; arrest (adult),5173,J99,main
+Respiratory failure; insufficiency; arrest (adult),5185,J961,supplementary
+Respiratory failure; insufficiency; arrest (adult),51851,J9600,main
+Respiratory failure; insufficiency; arrest (adult),51852,J953,main
+Respiratory failure; insufficiency; arrest (adult),51853,J9620,main
+Respiratory failure; insufficiency; arrest (adult),51881,J9690,main
+Respiratory failure; insufficiency; arrest (adult),51882,R0603,main
+Respiratory failure; insufficiency; arrest (adult),51883,J9610,main
+Respiratory failure; insufficiency; arrest (adult),51884,J9620,main
+Respiratory failure; insufficiency; arrest (adult),7991,R092,main
+Respiratory failure; insufficiency; arrest (adult),V461,Z998,supplementary
+Respiratory failure; insufficiency; arrest (adult),V4611,Z9911,main
+Respiratory failure; insufficiency; arrest (adult),V4612,Z9912,main
+Respiratory failure; insufficiency; arrest (adult),V4613,Z9911,main
+Respiratory failure; insufficiency; arrest (adult),V4614,J95850,main
+Respiratory failure; insufficiency; arrest (adult),V462,Z9981,main
+Other lower respiratory disease,5131,J853,main
+Other lower respiratory disease,514,J811,main
+Other lower respiratory disease,515,J8489,main
+Other lower respiratory disease,5160,J8401,main
+Other lower respiratory disease,5161,J8403,main
+Other lower respiratory disease,5162,J8402,main
+Other lower respiratory disease,5163,J8410,supplementary
+Other lower respiratory disease,51630,J84111,main
+Other lower respiratory disease,51631,J84112,main
+Other lower respiratory disease,51632,J84113,main
+Other lower respiratory disease,51633,J84114,main
+Other lower respiratory disease,51634,J84115,main
+Other lower respiratory disease,51635,J842,main
+Other lower respiratory disease,51636,J84116,main
+Other lower respiratory disease,51637,J84117,main
+Other lower respiratory disease,5164,J8481,main
+Other lower respiratory disease,5165,J8482,main
+Other lower respiratory disease,51661,J84841,main
+Other lower respiratory disease,51662,J84842,main
+Other lower respiratory disease,51663,J8483,main
+Other lower respiratory disease,51664,J84843,main
+Other lower respiratory disease,51669,J84848,main
+Other lower respiratory disease,5168,J8409,main
+Other lower respiratory disease,5169,J849,main
+Other lower respiratory disease,5172,M3481,main
+Respiratory failure; insufficiency; arrest (adult),5178,J99,main
+Other lower respiratory disease,5183,J82,main
+Other lower respiratory disease,5184,J810,main
+Other lower respiratory disease,51889,J984,main
+Other lower respiratory disease,5194,J986,main
+Other lower respiratory disease,5198,J988,main
+Other lower respiratory disease,5199,J989,main
+Other lower respiratory disease,7825,R230,main
+Other lower respiratory disease,78600,R069,main
+Other lower respiratory disease,78601,R064,main
+Other lower respiratory disease,78602,R0601,main
+Other lower respiratory disease,78603,R0681,main
+Other lower respiratory disease,78604,R063,main
+Other lower respiratory disease,78605,R0602,main
+Other lower respiratory disease,78606,R0682,main
+Other lower respiratory disease,78607,R062,main
+Other lower respiratory disease,78609,R0689,main
+Other lower respiratory disease,7862,R05,main
+Other lower respiratory disease,7863,R069,supplementary
+Other lower respiratory disease,78630,R049,main
+Other lower respiratory disease,78631,R0481,main
+Other lower respiratory disease,78639,R0489,main
+Other lower respiratory disease,7864,R093,main
+Other lower respiratory disease,78652,R0781,main
+Other lower respiratory disease,7866,R222,main
+Other lower respiratory disease,7867,R0989,main
+Other lower respiratory disease,7868,R066,main
+Other lower respiratory disease,7869,R0689,main
+Other lower respiratory disease,7931,R918,supplementary
+Other lower respiratory disease,79311,R911,main
+Other lower respiratory disease,79319,R918,main
+Other lower respiratory disease,7942,R942,main
+Other lower respiratory disease,V1260,Z8709,main
+Other lower respiratory disease,V1261,Z8701,main
+Other lower respiratory disease,V1269,Z8709,main
+Other lower respiratory disease,V426,Z942,main
+Other upper respiratory disease,470,J342,main
+Other upper respiratory disease,4710,J330,main
+Other upper respiratory disease,4711,J331,main
+Other upper respiratory disease,4718,J338,main
+Other upper respiratory disease,4719,J339,main
+Other upper respiratory disease,4720,J310,main
+Other upper respiratory disease,4721,J312,main
+Other upper respiratory disease,4722,J311,main
+Other upper respiratory disease,4760,J370,main
+Other upper respiratory disease,4761,J371,main
+Other upper respiratory disease,4770,J301,main
+Other upper respiratory disease,4772,J3081,main
+Other upper respiratory disease,4778,J3089,main
+Other upper respiratory disease,4779,J309,main
+Other upper respiratory disease,4780,J343,main
+Other upper respiratory disease,4781,J393,supplementary
+Other upper respiratory disease,47811,J3481,main
+Other upper respiratory disease,47819,J3489,main
+Other upper respiratory disease,47820,J392,main
+Other upper respiratory disease,47821,J391,main
+Other upper respiratory disease,47822,J390,main
+Other upper respiratory disease,47824,J390,main
+Other upper respiratory disease,47825,J392,main
+Other upper respiratory disease,47826,J392,main
+Other upper respiratory disease,47829,J392,main
+Other upper respiratory disease,47830,J3800,main
+Other upper respiratory disease,47831,J3801,main
+Other upper respiratory disease,47832,J3801,main
+Other upper respiratory disease,47833,J3802,main
+Other upper respiratory disease,47834,J3802,main
+Other upper respiratory disease,4784,J381,main
+Other upper respiratory disease,4785,J383,main
+Other upper respiratory disease,4786,J384,main
+Other upper respiratory disease,47870,J387,main
+Other upper respiratory disease,47871,J387,main
+Other upper respiratory disease,47874,J386,main
+Other upper respiratory disease,47875,J385,main
+Other upper respiratory disease,47879,J387,main
+Other upper respiratory disease,4788,J393,main
+Other upper respiratory disease,4789,J399,main
+Other lower respiratory disease,5191,J988,supplementary
+Other upper respiratory disease,51911,J9801,main
+Other upper respiratory disease,51919,J9809,main
+Other upper respiratory disease,5192,J9851,main
+Other upper respiratory disease,5193,J9859,main
+Other upper respiratory disease,7841,R070,main
+Other upper respiratory disease,78440,R499,main
+Other upper respiratory disease,78441,R491,main
+Other upper respiratory disease,78442,R490,main
+Other upper respiratory disease,78443,R4921,main
+Other upper respiratory disease,78444,R4922,main
+Other upper respiratory disease,78449,R498,main
+Other upper respiratory disease,7847,R040,main
+Other upper respiratory disease,7848,R041,main
+Other upper respiratory disease,78499,R196,main
+Other upper respiratory disease,7861,R061,main
+Other upper respiratory disease,V414,R4789,main
+Other upper respiratory disease,V440,Z930,main
+Other upper respiratory disease,V550,Z430,main
+Other liver diseases,570,K762,main
+Other liver diseases,5715,K7469,main
+Other liver diseases,5716,K745,main
+Other liver diseases,5718,K7689,main
+Other liver diseases,5719,K769,main
+Other liver diseases,5720,K750,main
+Other liver diseases,5721,K751,main
+Other liver diseases,5722,K7291,main
+Other liver diseases,5723,K766,main
+Other liver diseases,5724,K767,main
+Other liver diseases,5728,K7290,main
+Other liver diseases,5730,K761,main
+Other liver diseases,5734,K763,main
+Other liver diseases,5735,K7681,main
+Other liver diseases,5738,K7689,main
+Other liver diseases,5739,K769,main
+Other liver diseases,7824,R17,main
+Other liver diseases,7891,R160,main
+Other liver diseases,7895,R198,supplementary
+Other liver diseases,78959,R188,main
+Other liver diseases,7904,R740,main
+Other liver diseases,7905,R748,main
+Other liver diseases,7948,R945,main
+Other liver diseases,V427,Z944,main
+Gastrointestinal hemorrhage,4560,I8501,main
+Gastrointestinal hemorrhage,45620,I8511,main
+Gastrointestinal hemorrhage,5307,K226,main
+Gastrointestinal hemorrhage,53082,K228,main
+Gastrointestinal hemorrhage,53100,K250,main
+Gastrointestinal hemorrhage,53101,K56699,main
+Gastrointestinal hemorrhage,53120,K252,main
+Gastrointestinal hemorrhage,53121,K56699,main
+Gastrointestinal hemorrhage,53140,K254,main
+Gastrointestinal hemorrhage,53141,K56699,main
+Gastrointestinal hemorrhage,53160,K256,main
+Gastrointestinal hemorrhage,53161,K56699,main
+Gastrointestinal hemorrhage,53200,K260,main
+Gastrointestinal hemorrhage,53201,K56699,main
+Gastrointestinal hemorrhage,53220,K262,main
+Gastrointestinal hemorrhage,53221,K56699,main
+Gastrointestinal hemorrhage,53240,K264,main
+Gastrointestinal hemorrhage,53241,K56699,main
+Gastrointestinal hemorrhage,53260,K266,main
+Gastrointestinal hemorrhage,53261,K56699,main
+Gastrointestinal hemorrhage,53300,K270,main
+Gastrointestinal hemorrhage,53301,K270,main
+Gastrointestinal hemorrhage,53320,K272,main
+Gastrointestinal hemorrhage,53321,K272,main
+Gastrointestinal hemorrhage,53340,K274,main
+Gastrointestinal hemorrhage,53341,K274,main
+Gastrointestinal hemorrhage,53360,K276,main
+Gastrointestinal hemorrhage,53361,K276,main
+Gastrointestinal hemorrhage,53400,K280,main
+Gastrointestinal hemorrhage,53401,K280,main
+Gastrointestinal hemorrhage,53420,K282,main
+Gastrointestinal hemorrhage,53421,K282,main
+Gastrointestinal hemorrhage,53440,K284,main
+Gastrointestinal hemorrhage,53441,K284,main
+Gastrointestinal hemorrhage,53460,K286,main
+Gastrointestinal hemorrhage,53461,K286,main
+Gastrointestinal hemorrhage,5693,K625,main
+Gastrointestinal hemorrhage,5780,K920,main
+Gastrointestinal hemorrhage,5781,K921,main
+Gastrointestinal hemorrhage,5789,K922,main
+Acute and unspecified renal failure,5845,N170,main
+Acute and unspecified renal failure,5846,N171,main
+Acute and unspecified renal failure,5847,N172,main
+Acute and unspecified renal failure,5848,N178,main
+Acute and unspecified renal failure,5849,N179,main
+Acute and unspecified renal failure,586,N19,main
+Chronic kidney disease,585,N189,supplementary
+Chronic kidney disease,5851,N181,main
+Chronic kidney disease,5852,N182,main
+Chronic kidney disease,5853,N183,main
+Chronic kidney disease,5854,N184,main
+Chronic kidney disease,5855,N185,main
+Chronic kidney disease,5856,N186,main
+Chronic kidney disease,5859,N189,main
+Chronic kidney disease,7925,R880,main
+Chronic kidney disease,V420,Z940,main
+Chronic kidney disease,V451,Z992,supplementary
+Chronic kidney disease,V4511,Z992,main
+Chronic kidney disease,V4512,Z9115,main
+Chronic kidney disease,V560,Z4931,main
+Chronic kidney disease,V561,Z4901,main
+Chronic kidney disease,V562,Z4902,main
+Chronic kidney disease,V5631,Z4931,main
+Chronic kidney disease,V5632,Z4932,main
+Chronic kidney disease,V568,Z4932,main
+Complications of surgical procedures or medical care,27661,E8771,main
+Complications of surgical procedures or medical care,27783,E7143,main
+Complications of surgical procedures or medical care,27788,E883,main
+Complications of surgical procedures or medical care,2853,D6481,main
+Complications of surgical procedures or medical care,28741,D6951,main
+Complications of surgical procedures or medical care,3490,G971,main
+Complications of surgical procedures or medical care,3491,G9782,main
+Complications of surgical procedures or medical care,34931,G9741,main
+Complications of surgical procedures or medical care,41511,T82818A,main
+Complications of surgical procedures or medical care,4294,I97190,main
+Complications of surgical procedures or medical care,4582,I952,supplementary
+Complications of surgical procedures or medical care,45821,I953,main
+Complications of surgical procedures or medical care,45829,I9581,main
+Complications of surgical procedures or medical care,5121,J95811,main
+Complications of surgical procedures or medical care,5122,J95812,main
+Complications of surgical procedures or medical care,5187,J9584,main
+Complications of surgical procedures or medical care,51900,J9500,main
+Complications of surgical procedures or medical care,51901,J9502,main
+Complications of surgical procedures or medical care,51902,J9503,main
+Complications of surgical procedures or medical care,51909,J9509,main
+Complications of surgical procedures or medical care,53086,K9432,main
+Complications of surgical procedures or medical care,53087,K9433,main
+Complications of surgical procedures or medical care,53640,K9420,main
+Complications of surgical procedures or medical care,53641,K9422,main
+Complications of surgical procedures or medical care,53642,K9423,main
+Complications of surgical procedures or medical care,53649,K9429,main
+Complications of surgical procedures or medical care,53901,K9501,main
+Complications of surgical procedures or medical care,53909,K9509,main
+Complications of surgical procedures or medical care,53981,K9581,main
+Complications of surgical procedures or medical care,53989,K9589,main
+Complications of surgical procedures or medical care,5642,K911,main
+Complications of surgical procedures or medical care,5643,K910,main
+Complications of surgical procedures or medical care,5644,K9189,main
+Complications of surgical procedures or medical care,56962,K9413,main
+Complications of surgical procedures or medical care,56971,K91850,main
+Complications of surgical procedures or medical care,56979,K91858,main
+Complications of surgical procedures or medical care,5793,K912,main
+Complications of surgical procedures or medical care,59681,N99511,main
+Complications of surgical procedures or medical care,78062,R5082,main
+Complications of surgical procedures or medical care,78063,R5083,main
+Complications of surgical procedures or medical care,78066,R5084,main
+Complications of surgical procedures or medical care,9093,T82856S,main
+Complications of surgical procedures or medical care,99524,T8852XA,main
+Complications of surgical procedures or medical care,9954,T882XXA,main
+Complications of surgical procedures or medical care,99586,T883XXA,main
+Complications of surgical procedures or medical care,99700,G9781,main
+Complications of surgical procedures or medical care,99701,G9782,main
+Complications of surgical procedures or medical care,99702,I97821,main
+Complications of surgical procedures or medical care,99709,G9782,main
+Complications of surgical procedures or medical care,9971,I9789,main
+Complications of surgical procedures or medical care,9972,T8172XA,main
+Complications of surgical procedures or medical care,9973,T8149XA,supplementary
+Complications of surgical procedures or medical care,99731,J95851,main
+Complications of surgical procedures or medical care,99732,J9589,main
+Complications of surgical procedures or medical care,99739,J9589,main
+Complications of surgical procedures or medical care,9974,T814,supplementary
+Complications of surgical procedures or medical care,99741,K9186,main
+Complications of surgical procedures or medical care,99749,K9132,main
+Complications of surgical procedures or medical care,9975,N9989,main
+Complications of surgical procedures or medical care,99760,T879,main
+Complications of surgical procedures or medical care,99761,T8730,main
+Complications of surgical procedures or medical care,99762,T8740,main
+Complications of surgical procedures or medical care,99769,T8789,main
+Complications of surgical procedures or medical care,99771,T81710A,main
+Complications of surgical procedures or medical care,99772,T81711A,main
+Complications of surgical procedures or medical care,99779,T8172XA,main
+Complications of surgical procedures or medical care,99791,I973,main
+Complications of surgical procedures or medical care,99799,I9789,main
+Complications of surgical procedures or medical care,9980,T811,supplementary
+Complications of surgical procedures or medical care,99800,T8110XA,main
+Complications of surgical procedures or medical care,99801,T8111XA,main
+Complications of surgical procedures or medical care,99802,T8112XA,main
+Complications of surgical procedures or medical care,99809,T8119XA,main
+Complications of surgical procedures or medical care,99811,I97620,main
+Complications of surgical procedures or medical care,99812,N99841,main
+Complications of surgical procedures or medical care,99813,N99843,main
+Complications of surgical procedures or medical care,9982,T888XXA,main
+Complications of surgical procedures or medical care,9983,T814,supplementary
+Complications of surgical procedures or medical care,99830,T8130XA,main
+Complications of surgical procedures or medical care,99831,T8132XA,main
+Complications of surgical procedures or medical care,99832,T8131XA,main
+Complications of surgical procedures or medical care,99833,T8133XA,main
+Complications of surgical procedures or medical care,9984,T81539A,main
+Complications of surgical procedures or medical care,99851,T814XXA,main
+Complications of surgical procedures or medical care,99859,T814XXA,main
+Complications of surgical procedures or medical care,9986,T8183XA,main
+Complications of surgical procedures or medical care,9987,T8169XA,main
+Complications of surgical procedures or medical care,99881,T8182XA,main
+Complications of surgical procedures or medical care,99882,H59029,main
+Complications of surgical procedures or medical care,99883,T8189XA,main
+Complications of surgical procedures or medical care,99889,T8189XA,main
+Complications of surgical procedures or medical care,9989,T819XXA,main
+Complications of surgical procedures or medical care,9990,T881XXA,main
+Complications of surgical procedures or medical care,9991,T800XXA,main
+Complications of surgical procedures or medical care,9992,T801XXA,main
+Complications of surgical procedures or medical care,9993,T812,supplementary
+Complications of surgical procedures or medical care,99934,T8022XA,main
+Complications of surgical procedures or medical care,99939,T880XXA,main
+Complications of surgical procedures or medical care,9994,T809,supplementary
+Complications of surgical procedures or medical care,99941,T8051XA,main
+Complications of surgical procedures or medical care,99942,T8052XA,main
+Complications of surgical procedures or medical care,99949,T8059XA,main
+Complications of surgical procedures or medical care,9995,T814,supplementary
+Complications of surgical procedures or medical care,99951,T8061XA,main
+Complications of surgical procedures or medical care,99952,T8062XA,main
+Complications of surgical procedures or medical care,99959,T8069XA,main
+Complications of surgical procedures or medical care,9996,T887,supplementary
+Complications of surgical procedures or medical care,99960,T8030XA,main
+Complications of surgical procedures or medical care,99961,T80319A,main
+Complications of surgical procedures or medical care,99962,T80310A,main
+Complications of surgical procedures or medical care,99963,T80311A,main
+Complications of surgical procedures or medical care,99969,T8039XA,main
+Complications of surgical procedures or medical care,99970,T8040XA,main
+Complications of surgical procedures or medical care,99971,T80419A,main
+Complications of surgical procedures or medical care,99972,T80410A,main
+Complications of surgical procedures or medical care,99973,T80411A,main
+Complications of surgical procedures or medical care,99974,T8049XA,main
+Complications of surgical procedures or medical care,99975,T80A0XA,main
+Complications of surgical procedures or medical care,99976,T80A19A,main
+Complications of surgical procedures or medical care,99977,T80A10A,main
+Complications of surgical procedures or medical care,99978,T80A11A,main
+Complications of surgical procedures or medical care,99979,T80A9XA,main
+Complications of surgical procedures or medical care,9998,T8089XA,supplementary
+Complications of surgical procedures or medical care,99980,T8092XA,main
+Complications of surgical procedures or medical care,99981,T80810A,main
+Complications of surgical procedures or medical care,99982,T80818A,main
+Complications of surgical procedures or medical care,99983,T80919A,main
+Complications of surgical procedures or medical care,99984,T80910A,main
+Complications of surgical procedures or medical care,99985,T80911A,main
+Complications of surgical procedures or medical care,99988,T8090XA,main
+Complications of surgical procedures or medical care,99989,T8089XA,main
+Complications of surgical procedures or medical care,9999,T889XXA,main
+Complications of surgical procedures or medical care,V1553,Z87821,main
+Complications of surgical procedures or medical care,V1580,Z9283,main
+Complications of surgical procedures or medical care,V1583,Z283,main
+Complications of surgical procedures or medical care,V9001,Z1801,main
+Complications of surgical procedures or medical care,V9009,Z1809,main
+Shock,78550,R579,main
+Shock,78551,R570,main
+Shock,78552,R6521,main
+Shock,78559,R578,main

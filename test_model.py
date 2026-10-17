@@ -1,31 +1,17 @@
 import torch
 import pickle
-import random
 import numpy as np
 from tqdm import tqdm
-from sklearn import metrics
 from model import HALOModel
 from config import HALOConfig
+from halo_utils import parse_args, setup, get_batch, paths
 
-SEED = 4
-random.seed(SEED)
-np.random.seed(SEED)
-torch.manual_seed(SEED)
-config = HALOConfig()
 
-local_rank = -1
-fp16 = False
-if local_rank == -1:
-  device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-  n_gpu = torch.cuda.device_count()
-else:
-  torch.cuda.set_device(local_rank)
-  device = torch.device("cuda", local_rank)
-  n_gpu = 1
-  # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
-  torch.distributed.init_process_group(backend='nccl')
-if torch.cuda.is_available():
- torch.cuda.manual_seed_all(SEED)
+# Usage: python test_model.py --target {labels,mortality,readmission}
+args = parse_args()
+config = HALOConfig(target=args.target)
+output_paths = paths(args.target)
+device = setup(seed=4)
 
 # Load training and test EHR datasets and supporting code/label mappings
 train_ehr_dataset = pickle.load(open('./data/trainDataset.pkl', 'rb'))
@@ -33,35 +19,7 @@ test_ehr_dataset = pickle.load(open('./data/testDataset.pkl', 'rb'))
 index_to_code = pickle.load(open("./data/indexToCode.pkl", "rb"))
 id_to_label = pickle.load(open("./data/idToLabel.pkl", "rb"))
 train_c = set([c for p in train_ehr_dataset for v in p['visits'] for c in v])
-test_ehr_dataset = [{'labels': p['labels'], 'visits': [[c for c in v if c in train_c] for v in p['visits']]} for p in test_ehr_dataset]
-
-def get_batch(loc, batch_size, mode):
-  # EHR data saved as [(P_1, L_1), (P_2, L_2), ... , (P_i, L_i)]
-  #   Where each patient P is [V_1, V_2, ... , V_j]
-  #     Where each visit V is [C_1, C_2, ... , C_k]
-  #   And where each Label L is a binary vector [L_1 ... L_n]
-  if mode == 'train':
-    ehr = train_ehr_dataset[loc:loc+batch_size]
-  elif mode == 'valid':
-    ehr = val_ehr_dataset[loc:loc+batch_size]
-  else:
-    ehr = test_ehr_dataset[loc:loc+batch_size]
-    
-  batch_ehr = np.zeros((len(ehr), config.n_ctx, config.total_vocab_size))
-  batch_mask = np.zeros((len(ehr), config.n_ctx, 1))
-  for i, p in enumerate(ehr):
-    visits = p['visits']
-    for j, v in enumerate(visits):
-      batch_ehr[i,j+2][v] = 1
-      batch_mask[i,j+2] = 1
-    batch_ehr[i,1,config.code_vocab_size:config.code_vocab_size+config.label_vocab_size] = np.array(p['labels']) # Set the patient labels
-    batch_ehr[i,len(visits)+1,config.code_vocab_size+config.label_vocab_size+1] = 1 # Set the final visit to have the end token
-    batch_ehr[i,len(visits)+2:,config.code_vocab_size+config.label_vocab_size+2] = 1 # Set the rest to the padded visit token
-  
-  batch_mask[:,1] = 1 # Set the mask to cover the labels
-  batch_ehr[:,0,config.code_vocab_size+config.label_vocab_size] = 1 # Set the first visits to be the start token
-  batch_mask = batch_mask[:,1:,:] # Shift the mask to match the shifted labels and predictions the model will return
-  return batch_ehr, batch_mask
+test_ehr_dataset = [{config.target: p[config.target], 'visits': [[c for c in v if c in train_c] for v in p['visits']]} for p in test_ehr_dataset]
 
 def conf_mat(x, y):
   totaltrue = np.sum(x)
@@ -75,7 +33,7 @@ def conf_mat(x, y):
 model = HALOModel(config).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=config.lr)
 
-checkpoint = torch.load('./save/halo_model', map_location=torch.device(device))
+checkpoint = torch.load(output_paths['model'], map_location=torch.device(device))
 model.load_state_dict(checkpoint['model'])
 optimizer.load_state_dict(checkpoint['optimizer'])
 
@@ -91,17 +49,17 @@ model.eval()
 with torch.no_grad():
  for v_i in tqdm(range(0, len(test_ehr_dataset), 2*config.batch_size)):
    # Get batch inputs
-   batch_ehr, batch_mask = get_batch(v_i, 2*config.batch_size, 'test')
+   batch_ehr, batch_mask = get_batch(test_ehr_dataset, v_i, 2*config.batch_size, config)
    batch_ehr = torch.tensor(batch_ehr, dtype=torch.float32).to(device)
    batch_mask = torch.tensor(batch_mask, dtype=torch.float32).to(device)
     
    # Get batch outputs
    test_loss, predictions, labels = model(batch_ehr, position_ids=None, ehr_labels=batch_ehr, ehr_masks=batch_mask, pos_loss_weight=config.pos_loss_weight)
-   batch_mask_array = batch_mask.squeeze().cpu().detach().numpy()
-   rounded_preds = np.around(predictions.squeeze().cpu().detach().numpy()).transpose((2,0,1)) 
+   batch_mask_array = batch_mask.squeeze(-1).cpu().detach().numpy()
+   rounded_preds = np.around(predictions.cpu().detach().numpy()).transpose((2,0,1)) 
    rounded_preds = rounded_preds + batch_mask_array - 1 # Setting the masked visits to be -1 to be ignored by the confusion matrix
    rounded_preds = rounded_preds.flatten()
-   true_values = labels.squeeze().cpu().detach().numpy().transpose((2,0,1))
+   true_values = labels.cpu().detach().numpy().transpose((2,0,1))
    true_values = true_values + batch_mask_array - 1 # Setting the masked visits to be -1 to be ignored by the confusion matrix
    true_values = true_values.flatten()
 
@@ -132,7 +90,7 @@ intermediate["Probabilities"] = probability_list
 intermediate["Num Visits"] = n_visits
 intermediate["Num Positive Codes"] = n_pos_codes
 intermediate["Num Total Codes"] = n_total_codes
-pickle.dump(intermediate, open("./results/testing_stats/HALO_intermediate_results.pkl", "wb"))
+pickle.dump(intermediate, open(output_paths['test_intermediate'], "wb"))
 
 #Extract, save, and display test metrics
 avg_loss = np.nanmean(loss_list)
@@ -157,7 +115,7 @@ metrics_dict['Test Log Probability'] = log_probability
 metrics_dict['Perplexity Per Visit'] = pp_visit
 metrics_dict['Perplexity Per Positive Code'] = pp_positive
 metrics_dict['Perplexity Per Possible Code'] = pp_possible
-pickle.dump(metrics_dict, open("./results/testing_stats/HALO_Metrics.pkl", "wb"))
+pickle.dump(metrics_dict, open(output_paths['test_metrics'], "wb"))
 
 print("Average Test Loss: ", avg_loss)
 print("Confusion Matrix: ", confusion_matrix)
@@ -207,7 +165,10 @@ def convert_ehr(ehrs, index_to_code=None):
         ehr_output.append(visit_output)
       if end:
         break
-    ehr_outputs.append({'visits': ehr_output, 'labels': labels_output})
+    # Store the generated target the same way as the real data:
+    # a label vector for 'labels', a single 0/1 value for mortality and readmission
+    target_output = labels_output if config.label_vocab_size > 1 else int(labels_output[0])
+    ehr_outputs.append({'visits': ehr_output, config.target: target_output})
   ehr = None
   ehr_output = None
   labels_output = None
@@ -226,4 +187,4 @@ for i in tqdm(range(0, len(train_ehr_dataset), config.sample_batch_size)):
   batch_synthetic_ehrs = convert_ehr(batch_synthetic_ehrs)
   synthetic_ehr_dataset += batch_synthetic_ehrs
 
-pickle.dump(synthetic_ehr_dataset, open(f'./results/datasets/haloDataset.pkl', 'wb'))
+pickle.dump(synthetic_ehr_dataset, open(output_paths['synthetic'], 'wb'))

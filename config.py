@@ -5,9 +5,10 @@
     GPT-2 Pytorch Model Derived From: https://github.com/graykode/gpt-2-Pytorch
 
  HALO Configuration
-   - total_vocab_size: total number of available tokens 
+   - target: which prediction target the label slot holds (labels, mortality, readmission)
+   - total_vocab_size: total number of available tokens (computed)
    - code_vocab_size: number of available medical codes 
-   - label_vocab_size: number of available label codes
+   - label_vocab_size: number of available label codes (set by target)
    - special_vocab_size: number of special tokens (START, END, PAD)
    - n_positions: number of positions available in the input sequence
    - n_ctx: amount of sequence information HALO can use as context
@@ -23,12 +24,18 @@
    - lr: learning rate
 '''
 
+# Size of the label slot HALO is conditioned on, for each prediction target
+TARGET_SIZES = {
+    'labels': 25,       # 25 CCS phenotypes (diagnosis prediction)
+    'mortality': 1,     # in-hospital mortality
+    'readmission': 1,   # 30-day readmission
+}
+
 class HALOConfig(object):
     def __init__(
             self,
-            total_vocab_size=6869, 
-            code_vocab_size=6841,   #medical codes to choose from original was 6841
-            label_vocab_size=25,    #label codes to choose from
+            target='labels',  #which target the label slot holds (see TARGET_SIZES)
+            code_vocab_size=28583,   #medical codes to choose from 
             special_vocab_size=3,   #start code, end code, pad code
             n_positions=56,  #56 positions available in the sequence
             n_ctx=48,  #how much sequence information can be used as context
@@ -43,10 +50,11 @@ class HALOConfig(object):
             pos_loss_weight=None,  #controls if positive examples are given more weight
             lr=1e-4,
     ):
-        self.total_vocab_size = total_vocab_size
+        self.target = target
         self.code_vocab_size = code_vocab_size
-        self.label_vocab_size = label_vocab_size
+        self.label_vocab_size = TARGET_SIZES[target]
         self.special_vocab_size = special_vocab_size
+        self.total_vocab_size = code_vocab_size + self.label_vocab_size + special_vocab_size
         self.n_positions = n_positions
         self.n_ctx = n_ctx
         self.n_embd = n_embd
