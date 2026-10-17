@@ -356,8 +356,6 @@ train_dataset, test_dataset = train_test_split(data, test_size=0.2, random_state
 train_dataset, val_dataset = train_test_split(train_dataset, test_size=0.1, random_state=4, shuffle=True) #90 10 
 
 
-
-
 # Save Everything
 print("Saving Everything")
 print(len(index_to_code))

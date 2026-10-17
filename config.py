@@ -35,7 +35,7 @@ class HALOConfig(object):
     def __init__(
             self,
             target='labels',  #which target the label slot holds (see TARGET_SIZES)
-            code_vocab_size=28583,   #medical codes to choose from 
+            code_vocab_size=28573,   #medical codes to choose from 
             special_vocab_size=3,   #start code, end code, pad code
             n_positions=56,  #56 positions available in the sequence
             n_ctx=48,  #how much sequence information can be used as context
