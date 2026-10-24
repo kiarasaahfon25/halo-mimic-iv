@@ -44,11 +44,12 @@ def target_vector(p, target):
 # Output files for a target, creating the folders if needed
 def paths(target):
     for folder in ['./save', './results/datasets', './results/testing_stats',
-                   './results/synthetic_training_stats']:
+                   './results/synthetic_training_stats', './results/loss_curves']:
         os.makedirs(folder, exist_ok=True)
     return {
         'model': f'./save/halo_model_{target}',
         'losses': f'./save/losses_{target}.pkl',
+        'loss_plot': f'./results/loss_curves/loss_{target}',
         'synthetic': f'./results/datasets/haloDataset_{target}.pkl',
         'test_intermediate': f'./results/testing_stats/HALO_intermediate_results_{target}.pkl',
         'test_metrics': f'./results/testing_stats/HALO_Metrics_{target}.pkl',
