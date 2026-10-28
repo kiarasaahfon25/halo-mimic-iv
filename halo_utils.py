@@ -15,13 +15,10 @@ import numpy as np
 from config import TARGET_SIZES
 
 
-def parse_args(subgroups=False):
+def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--target', choices=list(TARGET_SIZES), default='labels',
                         help='prediction target HALO is conditioned on')
-    if subgroups:
-        parser.add_argument('--subgroups', action='store_true',
-                            help='also report F1 by age group and sex')
     return parser.parse_args()
 
 
@@ -54,7 +51,6 @@ def paths(target):
         'test_intermediate': f'./results/testing_stats/HALO_intermediate_results_{target}.pkl',
         'test_metrics': f'./results/testing_stats/HALO_Metrics_{target}.pkl',
         'synthetic_training': f'./results/synthetic_training_stats/fully_synthetic_stats_{target}.pkl',
-        'synthetic_training_subgroups': f'./results/synthetic_training_stats/fully_synthetic_stats_{target}_age.pkl',
     }
 
 

@@ -7,12 +7,13 @@ from config import HALOConfig
 from halo_utils import parse_args, setup, target_vector, paths
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 
-# Usage: python evaluate_synthetic_training.py --target {labels,mortality,readmission} [--subgroups]
+# Usage: python evaluate_synthetic_training.py --target {labels,mortality,readmission}
 #   labels:      one classifier per CCS phenotype (diagnosis prediction)
 #   mortality:   in-hospital mortality
 #   readmission: 30-day readmission
-# --subgroups also reports F1 by age group and sex
-args = parse_args(subgroups=True)
+# Runs NUM_FOLDS-fold cross validation over each training set, testing every fold
+# on the same real test set, and reports F1 by age group and sex
+args = parse_args()
 config = HALOConfig(target=args.target)
 output_paths = paths(args.target)
 device = setup(seed=4)
@@ -25,6 +26,8 @@ EMBEDDING_DIM = 64
 NUM_TRAIN_EXAMPLES = 5000
 NUM_TEST_EXAMPLES = 1000
 NUM_VAL_EXAMPLES = 500
+# 1 trains once and early-stops on the real validation set instead
+NUM_FOLDS = 5
 
 # One task per label in the target (25 CCS phenotypes, or a single outcome)
 if args.target == 'labels':
@@ -108,6 +111,37 @@ def sample_balanced(dataset, label_idx, num_examples):
     ) + list(
         np.random.choice(neg, half, replace=False)
     )
+
+
+# Split a balanced dataset into k stratified folds (positives and negatives spread evenly)
+# Positives sampled with replacement may have duplicates in both train and val folds;
+# that's acceptable since the val fold is only used for early stopping
+def kfold_split(dataset, label_idx, k):
+    pos = [p for p in dataset if get_label(p, label_idx) == 1]
+    neg = [p for p in dataset if get_label(p, label_idx) == 0]
+    np.random.shuffle(pos)
+    np.random.shuffle(neg)
+    return [pos[f::k] + neg[f::k] for f in range(k)]
+
+
+# Mean and std of each metric across folds (subgroup F1s per group, skipping None)
+def summarize_folds(fold_results):
+    mean, std = {}, {}
+    for key, value in fold_results[0].items():
+        if key == 'Confusion Matrix':
+            continue
+        if isinstance(value, dict):
+            mean[key], std[key] = {}, {}
+            for group in value:
+                scores = [r[key][group] for r in fold_results if r[key][group] is not None]
+                mean[key][group] = np.mean(scores) if scores else None
+                std[key][group] = np.std(scores) if scores else None
+        else:
+            scores = [r[key] for r in fold_results]
+            mean[key] = np.mean(scores)
+            std[key] = np.std(scores)
+            print(f"{key}: {mean[key]:.4f} ± {std[key]:.4f}")
+    return mean, std
 
 
 def train_model(model, train_dataset, val_dataset, save_name, label_idx):
@@ -247,14 +281,13 @@ def test_model(model, test_dataset, label_idx):
     metrics_dict['AUPRC'] = auprc
 
     # F1 by age group and sex (test_dataset holds the real patients)
-    if args.subgroups:
-        age_list = [get_age_bin(p['last_age']) for p in test_dataset]
-        gender_list = [p['gender'] for p in test_dataset]
-        metrics_dict['Age F1 Score'] = subgroup_f1(
-            "Age", ["0-14", "15-24", "25-44", "45-64", "65-74", "75+"],
-            age_list, true_list, round_list)
-        metrics_dict['Gender F1 Score'] = subgroup_f1(
-            "Gender", ["F", "M"], gender_list, true_list, round_list)
+    age_list = [get_age_bin(p['last_age']) for p in test_dataset]
+    gender_list = [p['gender'] for p in test_dataset]
+    metrics_dict['Age F1 Score'] = subgroup_f1(
+        "Age", ["0-14", "15-24", "25-44", "45-64", "65-74", "75+"],
+        age_list, true_list, round_list)
+    metrics_dict['Gender F1 Score'] = subgroup_f1(
+        "Gender", ["F", "M"], gender_list, true_list, round_list)
 
     print('Test Loss: ', avg_loss)
     print('Confusion Matrix: ', cmatrix)
@@ -288,20 +321,33 @@ for i in LABEL_IDX_LIST:
         continue
 
     # Train on real and on synthetic data, test both on real data
-    for name, train_dataset in [('Real', train_dataset_real), ('HALO', train_dataset_halo)]:
-        save_name = f"syn_diag_{args.target}_{name}_{i}"
-        model = DiagnosisModel(config).to(device)
-        train_model(model, train_dataset, val_dataset, save_name, i)
+    for name, train_pool in [('Real', train_dataset_real), ('HALO', train_dataset_halo)]:
+        if NUM_FOLDS > 1:
+            folds = kfold_split(train_pool, i, NUM_FOLDS)
+            splits = [
+                (sum(folds[:f] + folds[f+1:], []), folds[f])
+                for f in range(NUM_FOLDS)
+            ]
+        else:
+            splits = [(train_pool, val_dataset)]
 
-        state = torch.load(f'./save/{save_name}', map_location=device)
-        model.load_state_dict(state['model'])
-        label_results[name] = test_model(model, test_dataset, i)
+        fold_results = []
+        for f, (train_dataset, fold_val_dataset) in enumerate(splits):
+            print(f"--- {name} fold {f+1}/{len(splits)} ---")
+            save_name = f"syn_diag_{args.target}_{name}_{i}_fold{f}"
+            model = DiagnosisModel(config).to(device)
+            train_model(model, train_dataset, fold_val_dataset, save_name, i)
+
+            state = torch.load(f'./save/{save_name}', map_location=device)
+            model.load_state_dict(state['model'])
+            fold_results.append(test_model(model, test_dataset, i))
+
+        print(f"--- {name} summary over {len(splits)} fold(s) ---")
+        mean, std = summarize_folds(fold_results)
+        print("\n")
+        label_results[name] = {'folds': fold_results, 'mean': mean, 'std': std}
 
     results[task_names[i]] = label_results
 
 
-if args.subgroups:
-    results_path = output_paths['synthetic_training_subgroups']
-else:
-    results_path = output_paths['synthetic_training']
-pickle.dump(results, open(results_path, "wb"))
+pickle.dump(results, open(output_paths['synthetic_training'], "wb"))
