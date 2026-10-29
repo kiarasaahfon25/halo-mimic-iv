@@ -1,3 +1,5 @@
+import os
+import time
 import torch
 import pickle
 import numpy as np
@@ -38,95 +40,102 @@ model.load_state_dict(checkpoint['model'])
 optimizer.load_state_dict(checkpoint['optimizer'])
 
 
-# Evaluate the trained HALO model on the test dataset
-confusion_matrix = None
-probability_list = []
-loss_list = []
-n_visits = 0
-n_pos_codes = 0
-n_total_codes = 0
 model.eval()
-with torch.no_grad():
- for v_i in tqdm(range(0, len(test_ehr_dataset), 2*config.batch_size)):
-   # Get batch inputs
-   batch_ehr, batch_mask = get_batch(test_ehr_dataset, v_i, 2*config.batch_size, config)
-   batch_ehr = torch.tensor(batch_ehr, dtype=torch.float32).to(device)
-   batch_mask = torch.tensor(batch_mask, dtype=torch.float32).to(device)
+
+# Evaluate the trained HALO model on the test dataset
+# Skipped if a previous run (e.g. before a SLURM preemption) already saved the metrics
+if os.path.exists(output_paths['test_metrics']):
+  print('Test metrics already exist, skipping evaluation')
+  for k, v in pickle.load(open(output_paths['test_metrics'], 'rb')).items():
+    print(f'{k}: ', v)
+else:
+  confusion_matrix = None
+  probability_list = []
+  loss_list = []
+  n_visits = 0
+  n_pos_codes = 0
+  n_total_codes = 0
+  with torch.no_grad():
+   for v_i in tqdm(range(0, len(test_ehr_dataset), 2*config.batch_size)):
+     # Get batch inputs
+     batch_ehr, batch_mask = get_batch(test_ehr_dataset, v_i, 2*config.batch_size, config)
+     batch_ehr = torch.tensor(batch_ehr, dtype=torch.float32).to(device)
+     batch_mask = torch.tensor(batch_mask, dtype=torch.float32).to(device)
     
-   # Get batch outputs
-   test_loss, predictions, labels = model(batch_ehr, position_ids=None, ehr_labels=batch_ehr, ehr_masks=batch_mask, pos_loss_weight=config.pos_loss_weight)
-   batch_mask_array = batch_mask.squeeze(-1).cpu().detach().numpy()
-   rounded_preds = np.around(predictions.cpu().detach().numpy()).transpose((2,0,1)) 
-   rounded_preds = rounded_preds + batch_mask_array - 1 # Setting the masked visits to be -1 to be ignored by the confusion matrix
-   rounded_preds = rounded_preds.flatten()
-   true_values = labels.cpu().detach().numpy().transpose((2,0,1))
-   true_values = true_values + batch_mask_array - 1 # Setting the masked visits to be -1 to be ignored by the confusion matrix
-   true_values = true_values.flatten()
+     # Get batch outputs
+     test_loss, predictions, labels = model(batch_ehr, position_ids=None, ehr_labels=batch_ehr, ehr_masks=batch_mask, pos_loss_weight=config.pos_loss_weight)
+     batch_mask_array = batch_mask.squeeze(-1).cpu().detach().numpy()
+     rounded_preds = np.around(predictions.cpu().detach().numpy()).transpose((2,0,1)) 
+     rounded_preds = rounded_preds + batch_mask_array - 1 # Setting the masked visits to be -1 to be ignored by the confusion matrix
+     rounded_preds = rounded_preds.flatten()
+     true_values = labels.cpu().detach().numpy().transpose((2,0,1))
+     true_values = true_values + batch_mask_array - 1 # Setting the masked visits to be -1 to be ignored by the confusion matrix
+     true_values = true_values.flatten()
 
-   # Append test lost
-   loss_list.append(test_loss.cpu().detach().numpy())
+     # Append test lost
+     loss_list.append(test_loss.cpu().detach().numpy())
     
-   # Add number of visits and codes
-   n_visits += torch.sum(batch_mask).cpu().item()
-   n_pos_codes += torch.sum(labels).cpu().item()
-   n_total_codes += (torch.sum(batch_mask) * config.total_vocab_size).cpu().item()
+     # Add number of visits and codes
+     n_visits += torch.sum(batch_mask).cpu().item()
+     n_pos_codes += torch.sum(labels).cpu().item()
+     n_total_codes += (torch.sum(batch_mask) * config.total_vocab_size).cpu().item()
 
-   # Add confusion matrix
-   batch_cmatrix = conf_mat(true_values == 1, rounded_preds == 1)
-   batch_cmatrix[0][0] = torch.sum(batch_mask) * config.total_vocab_size - batch_cmatrix[0][1] - batch_cmatrix[1][0] - batch_cmatrix[1][1] # Remove the masked values
-   confusion_matrix = batch_cmatrix if confusion_matrix is None else confusion_matrix + batch_cmatrix
+     # Add confusion matrix
+     batch_cmatrix = conf_mat(true_values == 1, rounded_preds == 1)
+     batch_cmatrix[0][0] = torch.sum(batch_mask) * config.total_vocab_size - batch_cmatrix[0][1] - batch_cmatrix[1][0] - batch_cmatrix[1][1] # Remove the masked values
+     confusion_matrix = batch_cmatrix if confusion_matrix is None else confusion_matrix + batch_cmatrix
 
-   # Calculate and add probabilities 
-   # Note that the masked codes will have probability 1 and be ignored
-   label_probs = torch.abs(labels - 1.0 + predictions)
-   log_prob = torch.sum(torch.log(label_probs)).cpu().item()
-   probability_list.append(log_prob)
+     # Calculate and add probabilities 
+     # Note that the masked codes will have probability 1 and be ignored
+     label_probs = torch.abs(labels - 1.0 + predictions)
+     log_prob = torch.sum(torch.log(label_probs)).cpu().item()
+     probability_list.append(log_prob)
 
-# Save intermediate values in case of error
-intermediate = {}
-intermediate["Losses"] = loss_list
-intermediate["Confusion Matrix"] = confusion_matrix
-intermediate["Probabilities"] = probability_list
-intermediate["Num Visits"] = n_visits
-intermediate["Num Positive Codes"] = n_pos_codes
-intermediate["Num Total Codes"] = n_total_codes
-pickle.dump(intermediate, open(output_paths['test_intermediate'], "wb"))
+  # Save intermediate values in case of error
+  intermediate = {}
+  intermediate["Losses"] = loss_list
+  intermediate["Confusion Matrix"] = confusion_matrix
+  intermediate["Probabilities"] = probability_list
+  intermediate["Num Visits"] = n_visits
+  intermediate["Num Positive Codes"] = n_pos_codes
+  intermediate["Num Total Codes"] = n_total_codes
+  pickle.dump(intermediate, open(output_paths['test_intermediate'], "wb"))
 
-#Extract, save, and display test metrics
-avg_loss = np.nanmean(loss_list)
-tn, fp, fn, tp = confusion_matrix.ravel()
-acc = (tn + tp)/(tn+fp+fn+tp)
-prc = tp/(tp+fp)
-rec = tp/(tp+fn)
-f1 = (2 * prc * rec)/(prc + rec)
-log_probability = np.sum(probability_list)
-pp_visit = np.exp(-log_probability/n_visits)
-pp_positive = np.exp(-log_probability/n_pos_codes)
-pp_possible = np.exp(-log_probability/n_total_codes)
+  #Extract, save, and display test metrics
+  avg_loss = np.nanmean(loss_list)
+  tn, fp, fn, tp = confusion_matrix.ravel()
+  acc = (tn + tp)/(tn+fp+fn+tp)
+  prc = tp/(tp+fp)
+  rec = tp/(tp+fn)
+  f1 = (2 * prc * rec)/(prc + rec)
+  log_probability = np.sum(probability_list)
+  pp_visit = np.exp(-log_probability/n_visits)
+  pp_positive = np.exp(-log_probability/n_pos_codes)
+  pp_possible = np.exp(-log_probability/n_total_codes)
 
-metrics_dict = {}
-metrics_dict['Test Loss'] = avg_loss
-metrics_dict['Confusion Matrix'] = confusion_matrix
-metrics_dict['Accuracy'] = acc
-metrics_dict['Precision'] = prc
-metrics_dict['Recall'] = rec
-metrics_dict['F1 Score'] = f1
-metrics_dict['Test Log Probability'] = log_probability
-metrics_dict['Perplexity Per Visit'] = pp_visit
-metrics_dict['Perplexity Per Positive Code'] = pp_positive
-metrics_dict['Perplexity Per Possible Code'] = pp_possible
-pickle.dump(metrics_dict, open(output_paths['test_metrics'], "wb"))
+  metrics_dict = {}
+  metrics_dict['Test Loss'] = avg_loss
+  metrics_dict['Confusion Matrix'] = confusion_matrix
+  metrics_dict['Accuracy'] = acc
+  metrics_dict['Precision'] = prc
+  metrics_dict['Recall'] = rec
+  metrics_dict['F1 Score'] = f1
+  metrics_dict['Test Log Probability'] = log_probability
+  metrics_dict['Perplexity Per Visit'] = pp_visit
+  metrics_dict['Perplexity Per Positive Code'] = pp_positive
+  metrics_dict['Perplexity Per Possible Code'] = pp_possible
+  pickle.dump(metrics_dict, open(output_paths['test_metrics'], "wb"))
 
-print("Average Test Loss: ", avg_loss)
-print("Confusion Matrix: ", confusion_matrix)
-print('Accuracy: ', acc)
-print('Precision: ', prc)
-print('Recall: ', rec)
-print('F1 Score: ', f1)
-print('Test Log Probability: ', log_probability)
-print('Perplexity Per Visit: ', pp_visit)
-print('Perplexity Per Positive Code: ', pp_positive)
-print('Perplexity Per Possible Code: ', pp_possible)
+  print("Average Test Loss: ", avg_loss)
+  print("Confusion Matrix: ", confusion_matrix)
+  print('Accuracy: ', acc)
+  print('Precision: ', prc)
+  print('Recall: ', rec)
+  print('F1 Score: ', f1)
+  print('Test Log Probability: ', log_probability)
+  print('Perplexity Per Visit: ', pp_visit)
+  print('Perplexity Per Positive Code: ', pp_positive)
+  print('Perplexity Per Possible Code: ', pp_possible)
 
 def sample_sequence(model, length, context, batch_size, device='cuda', sample=True):
   empty = torch.zeros((1,1,config.total_vocab_size), device=device, dtype=torch.float32).repeat(batch_size, 1, 1)
@@ -178,13 +187,32 @@ def convert_ehr(ehrs, index_to_code=None):
   return ehr_outputs
 
 # Generate Synthetic EHR dataset
+# Progress is saved after every batch so a preempted/requeued SLURM job resumes where it stopped
 synthetic_ehr_dataset = []
+start_i = 0
+if os.path.exists(output_paths['synthetic_partial']):
+  partial = pickle.load(open(output_paths['synthetic_partial'], 'rb'))
+  synthetic_ehr_dataset = partial['data']
+  start_i = partial['next_i']
+  print(f'Resuming synthetic generation at patient {start_i} ({len(synthetic_ehr_dataset)} already generated)', flush=True)
+
 stoken = np.zeros(config.total_vocab_size)
 stoken[config.code_vocab_size+config.label_vocab_size] = 1
-for i in tqdm(range(0, len(train_ehr_dataset), config.sample_batch_size)):
+n_batches = (len(train_ehr_dataset) + config.sample_batch_size - 1) // config.sample_batch_size
+for i in tqdm(range(start_i, len(train_ehr_dataset), config.sample_batch_size), initial=start_i // config.sample_batch_size, total=n_batches):
+  start_time = time.time()
+  torch.manual_seed(4 + i) # Seed per batch so a resumed run generates the same batches
   bs = min([len(train_ehr_dataset)-i, config.sample_batch_size])
   batch_synthetic_ehrs = sample_sequence(model, config.n_ctx, stoken, batch_size=bs, device=device, sample=True)
   batch_synthetic_ehrs = convert_ehr(batch_synthetic_ehrs)
   synthetic_ehr_dataset += batch_synthetic_ehrs
 
+  # Write to a temp file first so a kill mid-write can't corrupt the saved progress
+  tmp_path = output_paths['synthetic_partial'] + '.tmp'
+  with open(tmp_path, 'wb') as f:
+    pickle.dump({'next_i': i + config.sample_batch_size, 'data': synthetic_ehr_dataset}, f)
+  os.replace(tmp_path, output_paths['synthetic_partial'])
+  print(f'batch {i // config.sample_batch_size + 1}/{n_batches} took {time.time() - start_time:.0f}s', flush=True)
+
 pickle.dump(synthetic_ehr_dataset, open(output_paths['synthetic'], 'wb'))
+os.remove(output_paths['synthetic_partial'])

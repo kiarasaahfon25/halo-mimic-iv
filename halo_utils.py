@@ -48,6 +48,7 @@ def paths(target):
         'losses': f'./save/losses_{target}.pkl',
         'loss_plot': f'./results/loss_curves/loss_{target}',
         'synthetic': f'./results/datasets/haloDataset_{target}.pkl',
+        'synthetic_partial': f'./results/datasets/haloDataset_{target}_partial.pkl',
         'test_intermediate': f'./results/testing_stats/HALO_intermediate_results_{target}.pkl',
         'test_metrics': f'./results/testing_stats/HALO_Metrics_{target}.pkl',
         'synthetic_training': f'./results/synthetic_training_stats/fully_synthetic_stats_{target}.pkl',
