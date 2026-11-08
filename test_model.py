@@ -1,6 +1,7 @@
 import os
 import time
 import torch
+import torch.nn.functional as F
 import pickle
 import numpy as np
 from tqdm import tqdm
@@ -41,6 +42,16 @@ optimizer.load_state_dict(checkpoint['optimizer'])
 
 
 model.eval()
+
+# Apply the fine head's autoregressive masks to its weights once, instead of
+# recomputing mask * weight on every call. The masks are 0/1, so the outputs are
+# identical (benchmark_sampling.py measured a max difference of exactly 0), and each
+# sampling step is about 4x cheaper. Only done here, after training, so the saved
+# checkpoint and train_model.py are unaffected.
+with torch.no_grad():
+  for layer in [model.ehr_head.auto1, model.ehr_head.auto2]:
+    layer.weight.mul_(layer.mask)
+    layer.forward = lambda x, layer=layer: F.linear(x, layer.weight, layer.bias)
 
 # Evaluate the trained HALO model on the test dataset
 # Skipped if a previous run (e.g. before a SLURM preemption) already saved the metrics
@@ -187,7 +198,9 @@ def convert_ehr(ehrs, index_to_code=None):
   return ehr_outputs
 
 # Generate Synthetic EHR dataset
-# Progress is saved after every batch so a preempted/requeued SLURM job resumes where it stopped
+# Progress is saved every SAVE_EVERY patients so a preempted/requeued SLURM job resumes
+# where it stopped (saving after every batch is too slow when batches are 1 patient)
+SAVE_EVERY = 1000
 synthetic_ehr_dataset = []
 start_i = 0
 if os.path.exists(output_paths['synthetic_partial']):
@@ -199,20 +212,28 @@ if os.path.exists(output_paths['synthetic_partial']):
 stoken = np.zeros(config.total_vocab_size)
 stoken[config.code_vocab_size+config.label_vocab_size] = 1
 n_batches = (len(train_ehr_dataset) + config.sample_batch_size - 1) // config.sample_batch_size
-for i in tqdm(range(start_i, len(train_ehr_dataset), config.sample_batch_size), initial=start_i // config.sample_batch_size, total=n_batches):
-  start_time = time.time()
+last_save = start_i
+chunk_start_time = time.time()
+for i in tqdm(range(start_i, len(train_ehr_dataset), config.sample_batch_size), initial=start_i // config.sample_batch_size, total=n_batches, mininterval=60):
   torch.manual_seed(4 + i) # Seed per batch so a resumed run generates the same batches
   bs = min([len(train_ehr_dataset)-i, config.sample_batch_size])
   batch_synthetic_ehrs = sample_sequence(model, config.n_ctx, stoken, batch_size=bs, device=device, sample=True)
   batch_synthetic_ehrs = convert_ehr(batch_synthetic_ehrs)
   synthetic_ehr_dataset += batch_synthetic_ehrs
 
-  # Write to a temp file first so a kill mid-write can't corrupt the saved progress
-  tmp_path = output_paths['synthetic_partial'] + '.tmp'
-  with open(tmp_path, 'wb') as f:
-    pickle.dump({'next_i': i + config.sample_batch_size, 'data': synthetic_ehr_dataset}, f)
-  os.replace(tmp_path, output_paths['synthetic_partial'])
-  print(f'batch {i // config.sample_batch_size + 1}/{n_batches} took {time.time() - start_time:.0f}s', flush=True)
+  next_i = i + config.sample_batch_size
+  if next_i - last_save >= SAVE_EVERY or next_i >= len(train_ehr_dataset):
+    # Write to a temp file first so a kill mid-write can't corrupt the saved progress
+    tmp_path = output_paths['synthetic_partial'] + '.tmp'
+    with open(tmp_path, 'wb') as f:
+      pickle.dump({'next_i': next_i, 'data': synthetic_ehr_dataset}, f)
+    os.replace(tmp_path, output_paths['synthetic_partial'])
+    n_done = min(next_i, len(train_ehr_dataset))
+    elapsed = time.time() - chunk_start_time
+    print(f'{n_done}/{len(train_ehr_dataset)} patients saved; last {n_done - last_save} took {elapsed:.0f}s '
+          f'({elapsed / max(n_done - last_save, 1):.3f}s per patient)', flush=True)
+    last_save = next_i
+    chunk_start_time = time.time()
 
 pickle.dump(synthetic_ehr_dataset, open(output_paths['synthetic'], 'wb'))
 os.remove(output_paths['synthetic_partial'])

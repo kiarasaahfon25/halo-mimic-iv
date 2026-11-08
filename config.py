@@ -45,7 +45,7 @@ class HALOConfig(object):
             layer_norm_epsilon=1e-5,  #normalization setting (not to be worried about much)
             initializer_range=0.02, #weight initialization
             batch_size=48,
-            sample_batch_size=256,
+            sample_batch_size=1,  #1 is fastest: larger batches need more fine-head steps per visit (see benchmark_sampling.py)
             epoch= 50, #original was 50, reducing for tests
             pos_loss_weight=None,  #controls if positive examples are given more weight
             lr=1e-4,
