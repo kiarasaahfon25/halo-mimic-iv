@@ -31,7 +31,17 @@ import torch
 import torch.nn.functional as F
 from model import HALOModel
 from config import HALOConfig, TARGET_SIZES
-from halo_utils import setup, paths, load_weights
+from halo_utils import setup, paths
+
+
+# Load checkpoint weights into the model. Works with both checkpoint formats:
+# the older one (full state_dict including the autoregressive masks, plus the
+# optimizer) and the newer weights-only one without the masks. Kept here instead
+# of importing from halo_utils so the benchmark runs with either version of it.
+def load_checkpoint_weights(model, weights):
+  missing, unexpected = model.load_state_dict(weights, strict=False)
+  if unexpected or any(not k.endswith('.mask') for k in missing):
+    raise RuntimeError(f'Checkpoint does not match the model: missing {missing}, unexpected {unexpected}')
 
 
 def parse_benchmark_args():
@@ -100,7 +110,7 @@ else:
 model = HALOModel(config).to(device)
 if not args.smoke_test:
   checkpoint = torch.load(output_paths['model'], map_location='cpu')
-  load_weights(model, checkpoint['model'])
+  load_checkpoint_weights(model, checkpoint['model'])
   del checkpoint
 model.eval()
 
