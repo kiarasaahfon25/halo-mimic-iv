@@ -136,6 +136,11 @@ def summarize_folds(fold_results):
                 scores = [r[key][group] for r in fold_results if r[key][group] is not None]
                 mean[key][group] = np.mean(scores) if scores else None
                 std[key][group] = np.std(scores) if scores else None
+                if scores:
+                    print(f"{key} {group}: {mean[key][group]:.4f} ± {std[key][group]:.4f} "
+                          f"({len(scores)}/{len(fold_results)} folds)")
+                else:
+                    print(f"{key} {group}: N/A (no patients or no actual positives)")
         else:
             scores = [r[key] for r in fold_results]
             mean[key] = np.mean(scores)
@@ -197,19 +202,20 @@ def train_model(model, train_dataset, val_dataset, save_name, label_idx):
     model.load_state_dict(state['model'])
 
 
+# Same age groups as the subgroup counts in build_dataset.py
+AGE_GROUPS = ["18-39", "40-64", "65-79", "80+"]
+
+
 def get_age_bin(age):
-    if 0 <= age <= 14:
-        return "0-14"
-    elif 15 <= age <= 24:
-        return "15-24"
-    elif 25 <= age <= 44:
-        return "25-44"
-    elif 45 <= age <= 64:
-        return "45-64"
-    elif 65 <= age <= 74:
-        return "65-74"
-    elif age >= 75:
-        return "75+"
+    if 18 <= age < 40:
+        return "18-39"
+    elif 40 <= age < 65:
+        return "40-64"
+    elif 65 <= age < 80:
+        return "65-79"
+    elif age >= 80:
+        return "80+"
+    return None
 
 
 # F1 score for each subgroup (e.g. age bin or sex)
@@ -227,13 +233,21 @@ def subgroup_f1(name, group_names, group_list, true_list, round_list):
 
         group_true = [x[0] for x in patients]
         group_pred = [x[1] for x in patients]
-        group_f1[group] = metrics.f1_score(group_true, group_pred, zero_division=0)
+        num_true, num_pred = int(sum(group_true)), int(sum(group_pred))
+
+        # F1 is undefined without actual positives; record None instead of 0
+        if num_true == 0:
+            group_f1[group] = None
+            f1_str = "N/A (no actual positives)"
+        else:
+            group_f1[group] = metrics.f1_score(group_true, group_pred, zero_division=0)
+            f1_str = f"{group_f1[group]:.4f}"
 
         print(
             f"{name} {group} - N: {len(patients)}, "
-            f"Actual positives: {sum(group_true)}, "
-            f"Predicted positives: {sum(group_pred)}, "
-            f"F1: {group_f1[group]:.4f}"
+            f"Actual positives: {num_true}, "
+            f"Predicted positives: {num_pred}, "
+            f"F1: {f1_str}"
         )
     return group_f1
 
@@ -284,8 +298,7 @@ def test_model(model, test_dataset, label_idx):
     age_list = [get_age_bin(p['last_age']) for p in test_dataset]
     gender_list = [p['gender'] for p in test_dataset]
     metrics_dict['Age F1 Score'] = subgroup_f1(
-        "Age", ["0-14", "15-24", "25-44", "45-64", "65-74", "75+"],
-        age_list, true_list, round_list)
+        "Age", AGE_GROUPS, age_list, true_list, round_list)
     metrics_dict['Gender F1 Score'] = subgroup_f1(
         "Gender", ["F", "M"], gender_list, true_list, round_list)
 
