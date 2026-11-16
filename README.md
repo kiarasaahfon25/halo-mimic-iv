@@ -49,6 +49,10 @@ python test_model.py --target labels
 
 # 5. Train classifiers on real vs. synthetic data and test on real data
 python evaluate_synthetic_training.py --target labels
+
+# 6. Privacy: attribute inference and membership inference attacks
+python evaluate_privacy_attribute.py --target labels
+python evaluate_privacy_membership.py --target labels
 ```
 
 Results are written to `results/` and model checkpoints to `save/`.
@@ -73,6 +77,11 @@ Results are written to `results/` and model checkpoints to `save/`.
 - Testing: every fold is tested on the same balanced sample of 2,000 real test patients.
 - Metrics: accuracy, precision, recall, F1, AUROC and AUPRC (mean ± std over folds).
 - Subgroups: F1 by sex and by age group (18-39, 40-64, 65-79, 80+). A group with no actual positives gets F1 = `None`.
+
+**Privacy evaluation (`evaluate_privacy_attribute.py`, `evaluate_privacy_membership.py`)**
+- Both follow the original HALO privacy experiments. The nearest-neighbour searches are vectorized (they give the same results as the original loops), so they run at MIMIC-IV scale.
+- Attribute inference: given a training patient's target and their 100 most common codes, guess their remaining codes from the closest synthetic patient (k = 1). The baseline does the same attack using real test patients instead; similar F1 scores mean low risk.
+- Membership inference: 7,500 training and 7,500 test patients. Guess "member" when the Hamming distance to the closest synthetic patient is below the median. Accuracy near 0.5 means low risk.
 
 **Other scripts**
 - `benchmark_sampling.py`: benchmarks synthetic generation speed.

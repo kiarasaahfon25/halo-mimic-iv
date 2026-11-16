@@ -1,5 +1,6 @@
 '''
-Code shared by train_model.py, test_model.py and evaluate_synthetic_training.py.
+Code shared by train_model.py, test_model.py, evaluate_synthetic_training.py and
+the privacy evaluations (evaluate_privacy_attribute.py, evaluate_privacy_membership.py).
 
 Each script is run once per prediction target, and each target gets its own HALO
 model, synthetic dataset and results:
@@ -41,7 +42,8 @@ def target_vector(p, target):
 # Output files for a target, creating the folders if needed
 def paths(target):
     for folder in ['./save', './results/datasets', './results/testing_stats',
-                   './results/synthetic_training_stats', './results/loss_curves']:
+                   './results/synthetic_training_stats', './results/loss_curves',
+                   './results/privacy_evaluation']:
         os.makedirs(folder, exist_ok=True)
     return {
         'model': f'./save/halo_model_{target}',
@@ -52,6 +54,8 @@ def paths(target):
         'test_intermediate': f'./results/testing_stats/HALO_intermediate_results_{target}.pkl',
         'test_metrics': f'./results/testing_stats/HALO_Metrics_{target}.pkl',
         'synthetic_training': f'./results/synthetic_training_stats/fully_synthetic_stats_{target}.pkl',
+        'privacy_attribute': f'./results/privacy_evaluation/attribute_inference_{target}.pkl',
+        'privacy_membership': f'./results/privacy_evaluation/hamming_model_{target}.pkl',
     }
 
 
